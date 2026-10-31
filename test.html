@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14121f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<title>Song Guessr – Testseite</title>
+<style>
+:root{--bg:#f6f4fb;--surface:#fff;--text:#1d1a2b;--muted:#6b6780;--accent:#6c3df5;--accent-text:#fff;--border:#d9d4ea;--ok:#13804a;--bad:#c4262e}
+@media (prefers-color-scheme:dark){:root{--bg:#14121f;--surface:#201d33;--text:#f0edfa;--muted:#a29cbc;--accent:#8e6bff;--accent-text:#14121f;--border:#38334f;--ok:#4cd08a;--bad:#ff7a82}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,sans-serif;padding:12px max(12px,env(safe-area-inset-right)) 40px max(12px,env(safe-area-inset-left))}
+h1{font-size:1.2rem;margin:4px 0 2px}
+.sub{color:var(--muted);font-size:.85rem;margin:0 0 12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px}
+label{display:block;font-size:.85rem;color:var(--muted);margin:8px 0 4px}
+input,select,button{font:inherit;color:var(--text);min-height:48px;border-radius:12px;border:1px solid var(--border);background:var(--bg);padding:8px 12px;width:100%}
+button{background:var(--accent);color:var(--accent-text);border:0;font-weight:600;cursor:pointer}
+button.sec{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+button:disabled{opacity:.45}
+.row{display:flex;gap:8px;margin-top:8px}.row>*{flex:1}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.92rem}
+.kv b{color:var(--muted);font-weight:500}
+#log{font:12px/1.35 ui-monospace,monospace;max-height:220px;overflow:auto;white-space:pre-wrap;color:var(--muted)}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+#disc{width:120px;height:120px;display:block;margin:6px auto}
+#disc.spin{animation:sp 2s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+/* Player: unsichtbar, aber >=200x200 und NICHT display:none */
+#pw{position:fixed;left:-400px;top:0;width:220px;height:220px;z-index:50;background:#000}
+#pw iframe{width:100%;height:100%;border:0}
+#pw.show{left:50%;top:12vh;transform:translateX(-50%);width:min(92vw,400px);height:min(52vw,225px)}
+#pclose{display:none;position:fixed;left:50%;top:calc(12vh + min(52vw,225px) + 8px);transform:translateX(-50%);z-index:51;width:auto;padding:8px 24px}
+#pclose.show{display:block}
+</style>
+</head>
+<body>
+<h1>Song Guessr · Etappe 0: Testseite · <a href="./" style="color:var(--accent)">zum Spiel</a></h1>
+<p class="sub">Playlist prüfen, versteckt abspielen, Ausschnitt testen. · v0.2</p>
+<div id="fileWarn" class="card bad" hidden>Läuft aus einer lokalen Datei: YouTube-Einbettung geht nur über https (GitHub Pages).</div>
+
+<div class="card">
+  <label for="url">Playlist-URL oder ID</label>
+  <input id="url" type="text" inputmode="url" autocomplete="off" placeholder="https://youtube.com/playlist?list=PL…">
+  <label for="known">Oder aus playlists.js</label>
+  <select id="known"><option value="">–</option></select>
+  <div class="row"><button id="load">Playlist laden</button></div>
+  <div class="kv" style="margin-top:10px">
+    <b>Status</b><span id="st">–</span>
+    <b>Videos</b><span id="cnt">–</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <div><label for="len">Länge</label><select id="len"><option value="0">ganzer Song</option><option value="3">3 s</option><option value="10" selected>10 s</option><option value="20">20 s</option></select></div>
+    <div><label for="start">Start</label><select id="start"><option value="start">vom Anfang</option><option value="random" selected>zufällig</option></select></div>
+  </div>
+  <svg id="disc" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="58" fill="#222"/><circle cx="60" cy="60" r="42" fill="none" stroke="#444" stroke-width="1"/><circle cx="60" cy="60" r="26" fill="hsl(280 80% 55%)"/><text x="60" y="70" text-anchor="middle" font-size="30" font-weight="700" fill="#fff">?</text></svg>
+  <div id="status" class="sub" style="text-align:center;min-height:1.4em;margin:0"></div>
+  <div class="row"><button id="play" disabled>Abspielen</button><button id="pause" class="sec" disabled>Pause</button></div>
+  <div class="row"><button id="again" class="sec" disabled>Nochmal hören</button><button id="next" class="sec" disabled>Nächster Song</button></div>
+  <div class="row"><button id="showp" class="sec">Player anzeigen</button></div>
+  <div class="kv" style="margin-top:10px">
+    <b>Titel</b><span id="vt">–</span>
+    <b>Kanal</b><span id="vc">–</span>
+    <b>Video-ID</b><span id="vid">–</span>
+    <b>Dauer</b><span id="vdur">–</span>
+    <b>Startpunkt</b><span id="vseek">–</span>
+    <b>Gehört</b><span id="vheard">0.0 s</span>
+    <b>Fehler</b><span id="verr">–</span>
+  </div>
+  <div class="row"><button id="reveal" class="sec" disabled>Titel/Kanal anzeigen</button></div>
+</div>
+
+<div class="card"><b>Log</b><div id="log"></div></div>
+<button id="pclose" class="sec">Player schließen</button>
+<div id="pw"><div id="ytp"></div></div>
+
+<script src="playlists.js"></script>
+<script>
+(function(){
+'use strict';
+const LS_KEY='songguessr-v1';
+const $=id=>document.getElementById(id);
+const ERR={2:'Ungültige Video-ID',5:'HTML5-Player-Fehler',100:'Video nicht gefunden/privat',101:'Einbettung vom Besitzer verboten',150:'Einbettung vom Besitzer verboten'};
+const S={player:null,ids:[],deck:[],cur:null,seg:null,heard:0,tickT:null,endT:null,seeked:false,first:false,revealed:false,errors:{},plId:null,loadTimer:null};
+
+function log(m,c){const d=$('log'),t=new Date().toLocaleTimeString('de-DE');d.insertAdjacentHTML('beforeend',`<div class="${c||''}">${t} ${String(m).replace(/</g,'&lt;')}</div>`);d.scrollTop=d.scrollHeight;window.__sgLog=(window.__sgLog||[]);window.__sgLog.push(String(m));}
+function store(){try{return JSON.parse(localStorage.getItem(LS_KEY))||{}}catch(e){return {}}}
+function save(o){try{localStorage.setItem(LS_KEY,JSON.stringify(o))}catch(e){}}
+function parseId(s){s=(s||'').trim();const m=s.match(/[?&]list=([A-Za-z0-9_-]+)/);if(m)return m[1];return /^[A-Za-z0-9_-]{10,}$/.test(s)?s:null;}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+if(location.protocol==='file:')$('fileWarn').hidden=false;
+
+// Bekannte Playlists aus playlists.js
+(window.SG_PLAYLISTS?SG_PLAYLISTS.genres:[]).forEach(g=>g.playlists.forEach(p=>{if(p.url){const o=document.createElement('option');o.value=p.url;o.textContent=g.name+' – '+p.name;$('known').appendChild(o);}}));
+$('known').onchange=()=>{if($('known').value)$('url').value=$('known').value;};
+const lastUrl=store().testUrl;if(lastUrl)$('url').value=lastUrl;
+
+function loadApi(){
+  if(window.YT&&window.YT.Player)return Promise.resolve();
+  return new Promise((res,rej)=>{
+    window.onYouTubeIframeAPIReady=res;
+    const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>rej(new Error('iframe_api nicht ladbar'));
+    document.head.appendChild(s);
+    setTimeout(()=>rej(new Error('Timeout beim Laden der YouTube-API')),12000);
+  });
+}
+
+function setBusy(on){['play','pause','again','next','reveal'].forEach(i=>$(i).disabled=on);}
+
+async function loadPlaylist(){
+  const id=parseId($('url').value);
+  if(!id){$('st').textContent='Keine gültige Playlist-ID';$('st').className='bad';return;}
+  const o=store();o.testUrl=$('url').value;save(o);
+  $('st').textContent='lade …';$('st').className='';$('cnt').textContent='–';
+  S.ids=[];S.deck=[];S.plId=id;setBusy(true);
+  try{await loadApi();}catch(e){$('st').textContent=e.message;$('st').className='bad';log(e.message,'bad');return;}
+  if(S.player){try{S.player.destroy();}catch(e){}S.player=null;const pw=$('pw');if(!$('ytp')){const d=document.createElement('div');d.id='ytp';pw.appendChild(d);}}
+  const vars={listType:'playlist',list:id,playsinline:1,rel:0,controls:1};
+  if(location.protocol.startsWith('http'))vars.origin=location.origin;
+  S.player=new YT.Player('ytp',{width:220,height:220,playerVars:vars,events:{onReady:onReady,onStateChange:onState,onError:onError}});
+}
+
+function onReady(){
+  log('Player bereit, warte auf getPlaylist() …');
+  let tries=0;
+  clearInterval(S.loadTimer);
+  S.loadTimer=setInterval(()=>{
+    tries++;let ids=[];try{ids=S.player.getPlaylist()||[];}catch(e){}
+    if(ids.length||tries>20){
+      clearInterval(S.loadTimer);
+      if(!ids.length){$('st').textContent='getPlaylist() leer (privat/ungültig/Mix?)';$('st').className='bad';log('getPlaylist leer','bad');return;}
+      S.ids=ids;S.deck=shuffle(ids);
+      $('st').textContent='geladen';$('st').className='ok';$('cnt').textContent=ids.length+(ids.length===200?'  (exakt 200 – evtl. Deckel!)':'');
+      const o=store();o.idCache=o.idCache||{};o.idCache[S.plId]={ids:ids,t:Date.now()};save(o);
+      log('Playlist '+S.plId+': '+ids.length+' Videos','ok');
+      setBusy(false);$('again').disabled=true;$('reveal').disabled=true;
+      nextSong(false);
+    }
+  },300);
+}
+
+function nextSong(autoplay){
+  if(!S.deck.length)S.deck=shuffle(S.ids);
+  S.cur=S.deck.pop();S.revealed=false;S.seg=null;S.heard=0;S.seeked=false;S.first=false;
+  stopTimers();$('vheard').textContent='0.0 s';
+  ['vt','vc','vdur','vseek'].forEach(i=>$(i).textContent='–');$('vid').textContent=S.cur;
+  $('disc').querySelector('circle:nth-of-type(3)').setAttribute('fill','hsl('+Math.floor(Math.random()*360)+' 80% 55%)');
+  $('again').disabled=true;$('reveal').disabled=false;
+  if(!autoplay){try{S.player.cueVideoById(S.cur);}catch(e){}setStatus('');}
+  log('Song gezogen: '+S.cur+' (Deck: '+S.deck.length+' übrig)');
+  if(autoplay)play();
+}
+
+function cfg(){return {len:+$('len').value,rnd:$('start').value==='random'};}
+
+function play(){
+  if(!S.cur||!S.player)return;
+  const c=cfg();S.first=true;S.seeked=false;S.heard=0;stopTimers();
+  try{if(c.rnd)S.player.mute();else S.player.unMute();}catch(e){}
+  S.player.loadVideoById(S.cur);
+  setStatus('lädt …');armWd();
+  log('Abspielen: '+(c.rnd?'zufälliger Start (stumm)':'vom Anfang')+', Länge '+(c.len||'ganz'));
+}
+
+function onState(e){
+  const st=e.data;const c=cfg();
+  if(st===1){ // PLAYING
+    $('disc').classList.add('spin');
+    if(S.first){
+      S.first=false;clearTimeout(S.wd);
+      let d=0;try{d=S.player.getDuration();}catch(x){}
+      $('vdur').textContent=d?d.toFixed(0)+' s':'unbekannt (Live?)';
+      if(c.rnd&&d>0){
+        const max=Math.max(0,d-(c.len||0)-2);const t=Math.floor(Math.random()*max);
+        S.seg=t;$('vseek').textContent=t+' s';S.seeked=true;
+        log('seekTo('+t+')');S.player.seekTo(t,true);
+        return; // warten auf nächstes PLAYING, dann entstummen
+      }
+      S.seg=0;$('vseek').textContent='0 s';
+      startSegment();return;
+    }
+    if(S.seeked){S.seeked=false;try{S.player.unMute();}catch(x){}startSegment();return;}
+    if(!S.tickT)startTick();
+    updateInfo();
+  }else if(st===2||st===0){
+    $('disc').classList.remove('spin');
+    if(st===0)log('Song zu Ende');
+  }
+}
+
+function setStatus(t){$('status').textContent=t;}
+function armWd(){clearTimeout(S.wd);S.retry=0;S.wd=setTimeout(wdFire,8000);}
+function wdFire(){
+  if(!S.first)return;
+  if(S.retry<1){S.retry++;log('Kein Start nach 8 s → neuer Versuch','bad');setStatus('lädt … (2. Versuch)');try{S.player.loadVideoById(S.cur);}catch(e){}S.wd=setTimeout(wdFire,8000);}
+  else{log('Kein Start nach 16 s – aufgegeben','bad');setStatus('hängt – bitte „Abspielen“ tippen');}
+}
+function startSegment(){
+  const c=cfg();updateInfo();$('again').disabled=false;setStatus('spielt …');
+  startTick();
+  if(c.len>0){clearTimeout(S.endT);S.endT=setTimeout(()=>{try{S.player.pauseVideo();}catch(e){}setStatus('Ausschnitt vorbei');log('Timer: Ausschnitt vorbei ('+c.len+' s)','ok');},c.len*1000);}
+}
+function startTick(){clearInterval(S.tickT);S.tickT=setInterval(()=>{let st=-1;try{st=S.player.getPlayerState();}catch(e){}if(st===1){S.heard+=0.2;$('vheard').textContent=S.heard.toFixed(1)+' s';}},200);}
+function stopTimers(){clearTimeout(S.endT);clearInterval(S.tickT);S.endT=null;S.tickT=null;}
+
+function updateInfo(){
+  try{const d=S.player.getVideoData();if(d&&d.video_id===S.cur||d&&d.title){S.vd=d;}}catch(e){}
+}
+
+function reveal(){
+  updateInfo();const d=S.vd||{};
+  $('vt').textContent=d.title||'(noch nicht verfügbar – erst abspielen)';$('vc').textContent=d.author||'–';
+  if(d.title)log('Aufgedeckt: '+d.title+' – '+d.author);
+}
+
+function onError(e){
+  const code=e.data;S.errors[code]=(S.errors[code]||0)+1;
+  const txt=ERR[code]||'Unbekannt';
+  $('verr').textContent=code+' – '+txt+' · gesamt: '+Object.entries(S.errors).map(([k,v])=>k+'×'+v).join(', ');$('verr').className='bad';
+  log('Fehler '+code+' ('+txt+') bei '+S.cur+' · Zähler: '+JSON.stringify(S.errors),'bad');
+  stopTimers();clearTimeout(S.wd);$('disc').classList.remove('spin');setStatus('Fehler '+code+' – nächster Song …');
+  if([2,5,100,101,150].includes(code)){
+    log('→ automatisch nächster Song');
+    setTimeout(()=>{nextSong(true);setTimeout(()=>{let st=-1;try{st=S.player.getPlayerState();}catch(x){}if(st!==1&&st!==3)log('Autoplay nach Fehler evtl. blockiert – bitte „Abspielen“ tippen','bad');},4000);},700);
+  }
+}
+
+$('load').onclick=loadPlaylist;
+$('play').onclick=play;
+$('pause').onclick=()=>{try{S.player.pauseVideo();}catch(e){}};
+$('again').onclick=()=>{if(S.seg==null)return;const c=cfg();S.heard=0;try{S.player.seekTo(S.seg,true);S.player.unMute();S.player.playVideo();}catch(e){}stopTimers();startSegment();log('Nochmal hören ab '+S.seg+' s');};
+$("next").onclick=()=>nextSong(false);
+$('reveal').onclick=reveal;
+function togglePlayer(on){$('pw').classList.toggle('show',on);$('pclose').classList.toggle('show',on);$('showp').textContent=on?'Player verbergen':'Player anzeigen';}
+$('showp').onclick=()=>togglePlayer(!$('pw').classList.contains('show'));
+$('pclose').onclick=()=>togglePlayer(false);
+
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+window.__sg={S:S,loadPlaylist:loadPlaylist};
+})();
+</script>
+</body>
+</html>

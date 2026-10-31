@@ -6,233 +6,455 @@
 <meta name="theme-color" content="#14121f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
-<title>Song Guessr – Test</title>
+<title>Song Guessr</title>
 <style>
-:root{--bg:#f6f4fb;--surface:#fff;--text:#1d1a2b;--muted:#6b6780;--accent:#6c3df5;--accent-text:#fff;--border:#d9d4ea;--ok:#13804a;--bad:#c4262e}
-@media (prefers-color-scheme:dark){:root{--bg:#14121f;--surface:#201d33;--text:#f0edfa;--muted:#a29cbc;--accent:#8e6bff;--accent-text:#14121f;--border:#38334f;--ok:#4cd08a;--bad:#ff7a82}}
+:root{--bg:#f6f4fb;--surface:#fff;--text:#1d1a2b;--muted:#6b6780;--accent:#6c3df5;--accent-text:#fff;--border:#d9d4ea;--ok:#13804a;--bad:#c4262e;--chip:#ece8f8}
+@media (prefers-color-scheme:dark){:root{--bg:#14121f;--surface:#201d33;--text:#f0edfa;--muted:#a29cbc;--accent:#8e6bff;--accent-text:#14121f;--border:#38334f;--ok:#4cd08a;--bad:#ff7a82;--chip:#2b2745}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,sans-serif;padding:12px max(12px,env(safe-area-inset-right)) 40px max(12px,env(safe-area-inset-left))}
-h1{font-size:1.2rem;margin:4px 0 2px}
-.sub{color:var(--muted);font-size:.85rem;margin:0 0 12px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:12px}
-label{display:block;font-size:.85rem;color:var(--muted);margin:8px 0 4px}
-input,select,button{font:inherit;color:var(--text);min-height:48px;border-radius:12px;border:1px solid var(--border);background:var(--bg);padding:8px 12px;width:100%}
-button{background:var(--accent);color:var(--accent-text);border:0;font-weight:600;cursor:pointer}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,sans-serif;padding:12px max(14px,env(safe-area-inset-right)) 48px max(14px,env(safe-area-inset-left));max-width:520px;margin-inline:auto;position:relative}
+h1{font-size:1.5rem;margin:6px 0}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);font-size:.85rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px}
+input[type=text],input[type=url],select{font:inherit;color:var(--text);min-height:50px;border-radius:12px;border:1px solid var(--border);background:var(--bg);padding:8px 12px;width:100%}
+button{font:inherit;min-height:52px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-text);font-weight:600;padding:8px 14px;width:100%;cursor:pointer}
 button.sec{background:var(--bg);color:var(--text);border:1px solid var(--border)}
-button:disabled{opacity:.45}
-.row{display:flex;gap:8px;margin-top:8px}.row>*{flex:1}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.92rem}
-.kv b{color:var(--muted);font-weight:500}
-#log{font:12px/1.35 ui-monospace,monospace;max-height:220px;overflow:auto;white-space:pre-wrap;color:var(--muted)}
-.ok{color:var(--ok)}.bad{color:var(--bad)}
-#disc{width:120px;height:120px;display:block;margin:6px auto}
+button.small{min-height:40px;font-size:.9rem;font-weight:500}
+button:disabled{opacity:.4}
+.row{display:flex;gap:8px;margin-top:10px}.row>*{flex:1}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.top button{width:auto;min-width:48px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{width:auto;min-height:44px;background:var(--chip);color:var(--text);font-weight:500;border:2px solid transparent;border-radius:22px;padding:6px 14px}
+.chip[aria-pressed=true]{border-color:var(--accent);background:var(--surface);font-weight:700}
+.chip:disabled{opacity:.45}
+.chk{display:flex;align-items:center;gap:10px;color:var(--text);font-size:1rem;margin:10px 0;min-height:44px}
+.chk input{width:26px;height:26px;flex:none}
+.msg{color:var(--bad);margin-top:8px;font-size:.92rem}
+#disc{width:min(62vw,240px);height:min(62vw,240px);display:block;margin:6px auto}
 #disc.spin{animation:sp 2s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
-/* Player: unsichtbar, aber >=200x200 und NICHT display:none */
-#pw{position:fixed;left:-400px;top:0;width:220px;height:220px;z-index:50;background:#000}
+#status{text-align:center;min-height:1.5em;color:var(--muted);margin:2px 0 6px}
+#hud{font-weight:600}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.95rem}.kv b{color:var(--muted);font-weight:500}
+.pl{border-top:1px solid var(--border);padding-top:10px;margin-top:10px}
+.pl input[type=text],.pl input[type=url]{margin-top:6px}
+.big{font-size:2rem;font-weight:800;text-align:center;margin:6px 0}
+ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
+/* Player: unsichtbar (>=200x200, außerhalb, NICHT display:none); beim Aufdecken/"Player anzeigen" über dem Slot */
+#pw{position:absolute;left:-400px;top:0;width:220px;height:220px;z-index:5;background:#000;border-radius:12px;overflow:hidden}
 #pw iframe{width:100%;height:100%;border:0}
-#pw.show{left:50%;top:12vh;transform:translateX(-50%);width:min(92vw,400px);height:min(52vw,225px)}
-#pclose{display:none;position:fixed;left:50%;top:calc(12vh + min(52vw,225px) + 8px);transform:translateX(-50%);z-index:51;width:auto;padding:8px 24px}
-#pclose.show{display:block}
+#pslot{width:100%;max-width:400px;height:min(56vw,225px);margin:10px auto}
+#tmpwrap{position:absolute;left:-600px;top:0;width:200px;height:200px}
+#helpBg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+#helpBox{background:var(--surface);color:var(--text);width:100%;max-width:520px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px 28px}
+#helpBox h3{margin:14px 0 4px;font-size:1rem}#helpBox p,#helpBox li{font-size:.93rem;margin:4px 0}
+.ver{text-align:center;margin-top:16px}.ver a{color:var(--muted)}
 </style>
 </head>
 <body>
-<h1>Song Guessr · Etappe 0: Testseite</h1>
-<p class="sub">Playlist prüfen, versteckt abspielen, Ausschnitt testen.</p>
-<div id="fileWarn" class="card bad" hidden>Läuft aus einer lokalen Datei: YouTube-Einbettung geht nur über https (GitHub Pages).</div>
 
-<div class="card">
-  <label for="url">Playlist-URL oder ID</label>
-  <input id="url" type="text" inputmode="url" autocomplete="off" placeholder="https://youtube.com/playlist?list=PL…">
-  <label for="known">Oder aus playlists.js</label>
-  <select id="known"><option value="">–</option></select>
-  <div class="row"><button id="load">Playlist laden</button></div>
-  <div class="kv" style="margin-top:10px">
-    <b>Status</b><span id="st">–</span>
-    <b>Videos</b><span id="cnt">–</span>
+<!-- ============ HOME ============ -->
+<section id="home">
+  <div class="top"><h1>🎵 Song Guessr</h1><button class="sec small" id="helpBtn" aria-label="Hilfe">?</button></div>
+  <div class="card">
+    <h2>Genres</h2>
+    <div class="sub">Nichts gewählt = gemischt aus allen aktiven Playlists.</div>
+    <div class="chips" id="chips"></div>
   </div>
-</div>
+  <div class="card">
+    <div class="row" style="margin-top:0">
+      <div><label for="sLen">Länge</label><select id="sLen"><option value="0">ganzer Song</option><option value="3">3 s</option><option value="10">10 s</option><option value="20">20 s</option></select></div>
+      <div><label for="sStart">Start</label><select id="sStart"><option value="start">vom Anfang</option><option value="random">zufälliger Ausschnitt</option></select></div>
+    </div>
+    <label for="sRounds">Runden</label>
+    <select id="sRounds"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="0">endlos</option></select>
+    <div class="row"><button id="startBtn">Spiel starten (Solo)</button></div>
+    <div class="msg" id="homeMsg" hidden></div>
+    <div class="row"><button class="sec" id="plBtn">Playlists verwalten</button></div>
+  </div>
+  <div class="sub ver">Song Guessr v1.0 (Etappe 1) · <a href="test.html">Testseite</a></div>
+</section>
 
-<div class="card">
-  <div class="row">
-    <div><label for="len">Länge</label><select id="len"><option value="0">ganzer Song</option><option value="3">3 s</option><option value="10" selected>10 s</option><option value="20">20 s</option></select></div>
-    <div><label for="start">Start</label><select id="start"><option value="start">vom Anfang</option><option value="random" selected>zufällig</option></select></div>
+<!-- ============ GAME ============ -->
+<section id="game" hidden>
+  <div class="top"><div id="hud">Runde 1 · 0 Punkte</div><button class="sec small" id="endBtn">Beenden</button></div>
+  <svg id="disc" viewBox="0 0 200 200" aria-label="Schallplatte mit Fragezeichen">
+    <circle cx="100" cy="100" r="97" fill="#17171c"/>
+    <circle cx="100" cy="100" r="88" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
+    <circle cx="100" cy="100" r="78" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
+    <circle cx="100" cy="100" r="68" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
+    <circle cx="100" cy="100" r="58" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
+    <path d="M100 8 A92 92 0 0 1 192 100" fill="none" stroke="#fff" stroke-opacity=".10" stroke-width="6" stroke-linecap="round"/>
+    <circle id="label" cx="100" cy="100" r="44" fill="hsl(280 75% 55%)"/>
+    <text x="100" y="118" text-anchor="middle" font-size="52" font-weight="800" fill="#fff" font-family="system-ui,sans-serif">?</text>
+    <circle cx="100" cy="100" r="4" fill="#17171c"/>
+  </svg>
+  <div id="status"></div>
+  <div class="card">
+    <label for="inTitle" style="margin-top:0">Titel</label>
+    <input type="text" id="inTitle" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <label for="inArtist">Interpret</label>
+    <input type="text" id="inArtist" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div class="row"><button id="play">Abspielen</button><button class="sec" id="pause">Pause</button></div>
+    <div class="row"><button class="sec" id="showp">Player anzeigen</button><button class="sec" id="skip">Überspringen</button></div>
+    <div class="row"><button id="reveal" disabled>Aufdecken</button></div>
+    <div class="sub" style="margin-top:6px">Aufdecken geht, sobald der Song einmal gespielt hat.</div>
   </div>
-  <svg id="disc" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="58" fill="#222"/><circle cx="60" cy="60" r="42" fill="none" stroke="#444" stroke-width="1"/><circle cx="60" cy="60" r="26" fill="hsl(280 80% 55%)"/><text x="60" y="70" text-anchor="middle" font-size="30" font-weight="700" fill="#fff">?</text></svg>
-  <div class="row"><button id="play" disabled>Abspielen</button><button id="pause" class="sec" disabled>Pause</button></div>
-  <div class="row"><button id="again" class="sec" disabled>Nochmal hören</button><button id="next" class="sec" disabled>Nächster Song</button></div>
-  <div class="row"><button id="showp" class="sec">Player anzeigen</button></div>
-  <div class="kv" style="margin-top:10px">
-    <b>Titel</b><span id="vt">–</span>
-    <b>Kanal</b><span id="vc">–</span>
-    <b>Video-ID</b><span id="vid">–</span>
-    <b>Dauer</b><span id="vdur">–</span>
-    <b>Startpunkt</b><span id="vseek">–</span>
-    <b>Gehört</b><span id="vheard">0.0 s</span>
-    <b>Fehler</b><span id="verr">–</span>
+  <div id="pslot" hidden></div>
+  <div class="card" id="rev" hidden>
+    <h2>Aufgedeckt</h2>
+    <div class="kv"><b>YouTube-Titel</b><span id="rTitle"></span><b>Kanal</b><span id="rChan"></span><b>Erkannt</b><span id="rParsed"></span></div>
+    <label class="chk"><input type="checkbox" id="ckT"> <span id="ckTl"></span></label>
+    <label class="chk"><input type="checkbox" id="ckA"> <span id="ckAl"></span></label>
+    <div class="sub">Haken sind vorbelegt (ähnlicher Abgleich), du kannst sie korrigieren.</div>
+    <div class="big" id="ptsPrev"></div>
+    <div class="row"><button id="nextBtn">Weiter</button></div>
   </div>
-  <div class="row"><button id="reveal" class="sec" disabled>Titel/Kanal anzeigen</button></div>
-</div>
+</section>
 
-<div class="card"><b>Log</b><div id="log"></div></div>
-<button id="pclose" class="sec">Player schließen</button>
+<!-- ============ ENDE ============ -->
+<section id="end" hidden>
+  <h1>Ergebnis</h1>
+  <div class="card">
+    <div class="big" id="endScore"></div>
+    <div class="sub" style="text-align:center" id="endSub"></div>
+    <ol class="h" id="endList"></ol>
+    <div class="row"><button id="againBtn">Nochmal spielen</button></div>
+    <div class="row"><button class="sec" id="menuBtn">Zum Menü</button></div>
+  </div>
+</section>
+
+<!-- ============ PLAYLISTS ============ -->
+<section id="plmgr" hidden>
+  <div class="top"><h1>Playlists</h1><button class="sec small" id="plBack">Zurück</button></div>
+  <div class="card">
+    <label class="chk" style="margin-top:0"><input type="checkbox" id="discard"> <span>Standard-Playlists verwerfen (nur eigene nutzen)</span></label>
+    <div class="sub">Bei einer Standard-Zeile kannst du eine eigene URL eintragen, die sie ersetzt. Leer lassen = Standard.</div>
+  </div>
+  <div class="card" id="plList"></div>
+  <div class="card">
+    <h2>Eigene Playlist hinzufügen</h2>
+    <label for="addName" style="margin-top:0">Name</label><input type="text" id="addName" placeholder="z. B. Meine 90er">
+    <label for="addUrl">YouTube-Playlist-URL</label><input type="url" id="addUrl" placeholder="https://youtube.com/playlist?list=…">
+    <div class="row"><button id="addBtn">Hinzufügen</button></div>
+    <div class="msg" id="addMsg" hidden></div>
+  </div>
+</section>
+
+<!-- ============ HILFE ============ -->
+<div id="helpBg" hidden><div id="helpBox">
+  <div class="top"><h2 style="margin:0">So geht's</h2><button class="sec small" id="helpClose">Schließen</button></div>
+  <h3>Spielablauf</h3>
+  <ol><li>Genres wählen (oder nichts = gemischt), Länge, Start und Rundenzahl einstellen, Spiel starten.</li>
+  <li>Auf <b>Abspielen</b> tippen: der Song läuft versteckt, die Platte dreht sich. <b>Nochmal hören</b> wiederholt denselben Ausschnitt.</li>
+  <li>Titel und Interpret eintippen, dann <b>Aufdecken</b>. Du siehst YouTube-Titel und Kanal, die Haken sind vorbelegt und von dir änderbar.</li>
+  <li><b>Weiter</b> bucht die Punkte und startet die nächste Runde (wieder per Tipp auf Abspielen).</li></ol>
+  <h3>Punkte</h3>
+  <p>Titel richtig: <b>2</b> Punkte, Interpret richtig: <b>1</b> Punkt. Der Abgleich ist tolerant: Groß/Klein, Akzente, Reihenfolge und kleine Tippfehler sind egal. Steht in beiden Feldern derselbe Text, zählt er nur einmal. Hinweise und Zeitbonus kommen in einer späteren Version.</p>
+  <h3>Player / Werbung</h3>
+  <p><b>Player anzeigen</b> blendet das Video ein, damit du Werbung wegklicken kannst. Werbung automatisch zu erkennen geht nicht.</p>
+  <p>Beste Nutzung mit Adblocker. Beobachtet: <b>Chrome</b> zeigt bei jedem Song Werbung, <b>Brave</b> blockt sie von selbst. Auch <b>Firefox mit uBlock Origin</b> sollte gehen (nicht geprüft). Ob der Blocker im <i>installierten</i> App-Fenster (PWA) greift, ist offen.</p>
+  <h3>Playlists</h3>
+  <p>Unter „Playlists verwalten“ kannst du eigene YouTube-Playlist-URLs eintragen, einzeln an/aus schalten und prüfen. Playlists sollten öffentlich oder nicht gelistet sein und Einbettung erlauben.</p>
+</div></div>
+
 <div id="pw"><div id="ytp"></div></div>
+<div id="tmpwrap"></div>
 
 <script src="playlists.js"></script>
 <script>
 (function(){
 'use strict';
-const LS_KEY='songguessr-v1';
 const $=id=>document.getElementById(id);
-const ERR={2:'Ungültige Video-ID',5:'HTML5-Player-Fehler',100:'Video nicht gefunden/privat',101:'Einbettung vom Besitzer verboten',150:'Einbettung vom Besitzer verboten'};
-const S={player:null,ids:[],deck:[],cur:null,seg:null,heard:0,tickT:null,endT:null,seeked:false,first:false,revealed:false,errors:{},plId:null,loadTimer:null};
+const K='songguessr-v1';
+const PTS={title:2,artist:1};              // Punkte-Konstanten
+const MATCH={minCov:0.75,minRecTitle:0.6,minRecArtist:0.34};
+const ERRCODES=[2,5,100,101,150];
+const CACHE_MS=7*24*3600*1000;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-function log(m,c){const d=$('log'),t=new Date().toLocaleTimeString('de-DE');d.insertAdjacentHTML('beforeend',`<div class="${c||''}">${t} ${String(m).replace(/</g,'&lt;')}</div>`);d.scrollTop=d.scrollHeight;window.__sgLog=(window.__sgLog||[]);window.__sgLog.push(String(m));}
-function store(){try{return JSON.parse(localStorage.getItem(LS_KEY))||{}}catch(e){return {}}}
-function save(o){try{localStorage.setItem(LS_KEY,JSON.stringify(o))}catch(e){}}
+/* ---------- Speicher ---------- */
+let DB=loadDB();
+function loadDB(){let o={};try{o=JSON.parse(localStorage.getItem(K))||{}}catch(e){}
+  o.settings=Object.assign({len:10,start:'random',rounds:10,genres:[]},o.settings);
+  o.pl=Object.assign({discardDefaults:false,override:{},off:{},custom:[]},o.pl);
+  o.idCache=o.idCache||{};return o;}
+function save(){try{localStorage.setItem(K,JSON.stringify(DB))}catch(e){}}
+
+/* ---------- Helfer ---------- */
 function parseId(s){s=(s||'').trim();const m=s.match(/[?&]list=([A-Za-z0-9_-]+)/);if(m)return m[1];return /^[A-Za-z0-9_-]{10,}$/.test(s)?s:null;}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-if(location.protocol==='file:')$('fileWarn').hidden=false;
+/* ---------- Abgleich ---------- */
+const STOP=new Set('the a an of and und der die das ein eine feat ft featuring with mit vs x'.split(' '));
+function norm(s){return String(s||'').toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/&/g,' and ').replace(/[^a-z0-9Ѐ-ӿ぀-ヿ一-鿿]+/g,' ').trim().replace(/\s+/g,' ');}
+function toks(s){const t=norm(s).split(' ').filter(Boolean);const f=t.filter(w=>!STOP.has(w));return f.length?f:t;}
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c;}return p[n];}
+function tokEq(a,b){if(a===b)return true;const mn=Math.min(a.length,b.length);if(mn<4)return false;return lev(a,b)<=(Math.max(a.length,b.length)>=7?2:1);}
+function matchRef(input,ref,minRec){
+  if(norm(input).length<2||!ref)return 0;
+  const I=toks(input),R=toks(ref);if(!I.length||!R.length)return 0;
+  const cov=I.filter(t=>R.some(r=>tokEq(t,r))).length/I.length;
+  const rec=R.filter(r=>I.some(t=>tokEq(t,r))).length/R.length;
+  return (cov>=MATCH.minCov&&rec>=minRec)?cov+rec:0;
+}
+const NOISE=((window.SG_PLAYLISTS&&SG_PLAYLISTS.noise)||[]).map(s=>{try{return new RegExp(s,'gi')}catch(e){return null}}).filter(Boolean);
+function cleanTitle(t){
+  let s=String(t||'');
+  s=s.replace(/[\(\[][^\)\]]*(official|video|audio|lyric|visuali[sz]er|remaster|\bhd\b|\bhq\b|4k|\bmv\b|explicit|clip)[^\)\]]*[\)\]]/gi,' ');
+  NOISE.forEach(r=>{s=s.replace(r,' ')});
+  s=s.replace(/[\(\[]\s*[\)\]]/g,' ').split(/\s[|｜]\s/)[0];
+  return s.replace(/\s+/g,' ').trim().replace(/[\-–—:\s]+$/,'').trim();
+}
+function stripFeat(s){return String(s||'').replace(/[\(\[]?\s*\b(feat\.?|ft\.?|featuring)\s[^\)\]]*[\)\]]?/gi,' ').replace(/\s+/g,' ').trim();}
+function cleanChannel(c){return String(c||'').replace(/\s*-\s*topic$/i,'').replace(/vevo$/i,'').replace(/\s*official(\s+channel)?$/i,'').trim();}
+function parseYT(title,channel){
+  const whole=cleanTitle(title);const parts=whole.split(/\s[-–—]\s/);
+  let artist='',ttl=whole;if(parts.length>=2){artist=parts[0];ttl=parts.slice(1).join(' - ');}
+  return {raw:title,whole,artist:stripFeat(artist),title:stripFeat(ttl),channel:cleanChannel(channel),channelRaw:channel};
+}
+function scoreTitle(inp,p){return Math.max(matchRef(inp,p.title,MATCH.minRecTitle),matchRef(inp,p.whole,MATCH.minRecTitle));}
+function scoreArtist(inp,p){return Math.max(matchRef(inp,p.artist,MATCH.minRecArtist),matchRef(inp,p.channel,MATCH.minRecArtist),matchRef(inp,p.whole,MATCH.minRecArtist));}
+function judge(inT,inA,p){
+  let sT=scoreTitle(inT,p),sA=scoreArtist(inA,p);
+  if(norm(inT)&&norm(inT)===norm(inA)&&sT>0&&sA>0){if(sT>=sA)sA=0;else sT=0;}   // gleicher Text zählt nur einmal
+  return {title:sT>0,artist:sA>0};
+}
 
-// Bekannte Playlists aus playlists.js
-(window.SG_PLAYLISTS?SG_PLAYLISTS.genres:[]).forEach(g=>g.playlists.forEach(p=>{if(p.url){const o=document.createElement('option');o.value=p.url;o.textContent=g.name+' – '+p.name;$('known').appendChild(o);}}));
-$('known').onchange=()=>{if($('known').value)$('url').value=$('known').value;};
-const lastUrl=store().testUrl;if(lastUrl)$('url').value=lastUrl;
+/* ---------- Quellen / Playlists ---------- */
+function sources(){
+  const out=[];const G=(window.SG_PLAYLISTS&&SG_PLAYLISTS.genres)||[];
+  if(!DB.pl.discardDefaults)G.forEach(g=>g.playlists.forEach((p,i)=>{
+    const key='d:'+g.id+':'+i,ov=(i===0&&DB.pl.override[g.id])||'';const url=ov||p.url;
+    out.push({key,genre:g.id,genreName:g.name,name:ov?'Eigene URL':p.name,url,defUrl:p.url,isDefault:true,hasUrl:!!parseId(url),on:!DB.pl.off[key],first:i===0});
+  }));
+  DB.pl.custom.forEach(c=>out.push({key:'c:'+c.id,genre:'eigene',genreName:'Eigene',name:c.name,url:c.url,custom:true,id:c.id,hasUrl:!!parseId(c.url),on:c.on!==false}));
+  return out;
+}
+function genreList(){
+  const src=sources(),G=(window.SG_PLAYLISTS&&SG_PLAYLISTS.genres)||[];
+  const list=G.map(g=>({id:g.id,name:g.name,ok:src.some(s=>s.genre===g.id&&s.hasUrl&&s.on)}));
+  if(DB.pl.custom.length)list.push({id:'eigene',name:'Eigene',ok:src.some(s=>s.custom&&s.hasUrl&&s.on)});
+  if(DB.pl.discardDefaults)return list.filter(g=>g.id==='eigene');
+  return list;
+}
+function activeSources(){
+  const sel=DB.settings.genres||[];
+  return sources().filter(s=>s.on&&s.hasUrl&&!S.bad[s.key]&&(!sel.length||sel.includes(s.genre)));
+}
 
+/* ---------- YouTube ---------- */
+const S={player:null,decks:{},bad:{},score:0,round:0,hist:[],cur:null,srcKey:null,seg:null,first:false,seeked:false,started:false,vd:null,revealed:false,endT:null,wd:null,retry:0,busy:false,pshown:false,pi:null,parsed:null,active:false};
 function loadApi(){
   if(window.YT&&window.YT.Player)return Promise.resolve();
-  return new Promise((res,rej)=>{
-    window.onYouTubeIframeAPIReady=res;
-    const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>rej(new Error('iframe_api nicht ladbar'));
-    document.head.appendChild(s);
-    setTimeout(()=>rej(new Error('Timeout beim Laden der YouTube-API')),12000);
-  });
+  return new Promise((res,rej)=>{window.onYouTubeIframeAPIReady=res;const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>rej(new Error('YouTube-API nicht ladbar (Netz?)'));document.head.appendChild(s);setTimeout(()=>rej(new Error('Zeitüberschreitung beim Laden der YouTube-API')),12000);});
+}
+function origin(v){if(location.protocol.startsWith('http'))v.origin=location.origin;return v;}
+function ensurePlayer(){
+  if(S.player)return Promise.resolve();
+  return loadApi().then(()=>new Promise(res=>{S.player=new YT.Player('ytp',{width:220,height:220,playerVars:origin({playsinline:1,rel:0,controls:1}),events:{onReady:()=>res(),onStateChange:onState,onError:onError}});}));
+}
+function fetchIds(id){
+  return loadApi().then(()=>new Promise((res,rej)=>{
+    const host=document.createElement('div');host.id='tmp'+Date.now()+Math.floor(Math.random()*1e4);$('tmpwrap').appendChild(host);
+    let done=false,p=null,iv=null;
+    const to=setTimeout(()=>fin(null,'Zeitüberschreitung'),15000);
+    function fin(ids,err){if(done)return;done=true;clearInterval(iv);clearTimeout(to);try{p&&p.destroy();}catch(e){}ids?res(ids):rej(new Error(err));}
+    p=new YT.Player(host.id,{width:200,height:200,playerVars:origin({listType:'playlist',list:id,playsinline:1}),events:{
+      onReady:()=>{let n=0;iv=setInterval(()=>{n++;let ids=[];try{ids=p.getPlaylist()||[];}catch(e){}if(ids.length)fin(ids);else if(n>25)fin(null,'Playlist leer, privat oder ungültig');},300);},
+      onError:e=>fin(null,'YouTube-Fehler '+e.data)}});
+  }));
+}
+async function ensureIds(id,force){
+  const c=DB.idCache[id];
+  if(!force&&c&&c.ids&&c.ids.length&&Date.now()-c.t<CACHE_MS)return c.ids;
+  const ids=await fetchIds(id);DB.idCache[id]={ids,t:Date.now()};save();return ids;
+}
+async function pickSong(){
+  const errs=[];
+  for(let g=0;g<30;g++){
+    const act=activeSources();
+    if(!act.length)throw new Error(errs.length?('Keine Playlist ladbar: '+errs.join('; ')):'Keine aktive Playlist. Trag unter „Playlists verwalten“ eine URL ein.');
+    const src=act[Math.floor(Math.random()*act.length)];
+    try{const id=parseId(src.url);const ids=await ensureIds(id);let deck=S.decks[id];if(!deck||!deck.length)deck=S.decks[id]=shuffle(ids);return {vid:deck.pop(),key:src.key};}
+    catch(e){S.bad[src.key]=e.message;errs.push(src.genreName+' – '+src.name+': '+e.message);}
+  }
+  throw new Error('Keine Playlist ladbar');
 }
 
-function setBusy(on){['play','pause','again','next','reveal'].forEach(i=>$(i).disabled=on);}
-
-async function loadPlaylist(){
-  const id=parseId($('url').value);
-  if(!id){$('st').textContent='Keine gültige Playlist-ID';$('st').className='bad';return;}
-  const o=store();o.testUrl=$('url').value;save(o);
-  $('st').textContent='lade …';$('st').className='';$('cnt').textContent='–';
-  S.ids=[];S.deck=[];S.plId=id;setBusy(true);
-  try{await loadApi();}catch(e){$('st').textContent=e.message;$('st').className='bad';log(e.message,'bad');return;}
-  if(S.player){try{S.player.destroy();}catch(e){}S.player=null;const pw=$('pw');if(!$('ytp')){const d=document.createElement('div');d.id='ytp';pw.appendChild(d);}}
-  const vars={listType:'playlist',list:id,playsinline:1,rel:0,controls:1};
-  if(location.protocol.startsWith('http'))vars.origin=location.origin;
-  S.player=new YT.Player('ytp',{width:220,height:220,playerVars:vars,events:{onReady:onReady,onStateChange:onState,onError:onError}});
+/* ---------- Ansichten ---------- */
+function show(id){['home','game','end','plmgr'].forEach(x=>$(x).hidden=x!==id);window.scrollTo(0,0);if(id!=='game')showPlayer(false);if(id==='home')renderHome();if(id==='plmgr')renderPl();}
+function setStatus(t){$('status').textContent=t||'';}
+function setBusy(on){S.busy=on;['play','pause','reveal','skip'].forEach(i=>$(i).disabled=on);if(!on)$('reveal').disabled=!S.vd||S.revealed;}
+function hud(){const r=DB.settings.rounds;$('hud').textContent='Runde '+(S.round+1)+(r?'/'+r:'')+' · '+S.score+' Punkte';}
+function placePlayer(){
+  const pw=$('pw');
+  if(!S.pshown){pw.style.left='-400px';pw.style.top='0px';pw.style.width='220px';pw.style.height='220px';return;}
+  const r=$('pslot').getBoundingClientRect();
+  pw.style.left=(r.left+scrollX)+'px';pw.style.top=(r.top+scrollY)+'px';pw.style.width=r.width+'px';pw.style.height=r.height+'px';
 }
+function showPlayer(on){S.pshown=on;$('pslot').hidden=!on;$('showp').textContent=on?'Player verbergen':'Player anzeigen';placePlayer();clearInterval(S.pi);S.pi=on?setInterval(placePlayer,400):null;}
+window.addEventListener('resize',placePlayer);
 
-function onReady(){
-  log('Player bereit, warte auf getPlaylist() …');
-  let tries=0;
-  clearInterval(S.loadTimer);
-  S.loadTimer=setInterval(()=>{
-    tries++;let ids=[];try{ids=S.player.getPlaylist()||[];}catch(e){}
-    if(ids.length||tries>20){
-      clearInterval(S.loadTimer);
-      if(!ids.length){$('st').textContent='getPlaylist() leer (privat/ungültig/Mix?)';$('st').className='bad';log('getPlaylist leer','bad');return;}
-      S.ids=ids;S.deck=shuffle(ids);
-      $('st').textContent='geladen';$('st').className='ok';$('cnt').textContent=ids.length+(ids.length===200?'  (exakt 200 – evtl. Deckel!)':'');
-      const o=store();o.idCache=o.idCache||{};o.idCache[S.plId]={ids:ids,t:Date.now()};save(o);
-      log('Playlist '+S.plId+': '+ids.length+' Videos','ok');
-      setBusy(false);$('again').disabled=true;$('reveal').disabled=true;
-      nextSong(false);
-    }
-  },300);
+function renderHome(){
+  const st=DB.settings;$('sLen').value=String(st.len);$('sStart').value=st.start;$('sRounds').value=String(st.rounds);
+  const gl=genreList();st.genres=(st.genres||[]).filter(id=>gl.some(g=>g.id===id));
+  $('chips').innerHTML=gl.map(g=>`<button class="chip" data-g="${esc(g.id)}" aria-pressed="${st.genres.includes(g.id)}" ${g.ok?'':'disabled'}>${esc(g.name)}${g.ok?'':' (leer)'}</button>`).join('')||'<span class="sub">Keine Genres.</span>';
+  $('homeMsg').hidden=true;
 }
+$('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b||b.disabled)return;const id=b.dataset.g,a=DB.settings.genres;const i=a.indexOf(id);i>=0?a.splice(i,1):a.push(id);save();renderHome();});
+['sLen','sStart','sRounds'].forEach(id=>$(id).addEventListener('change',()=>{DB.settings.len=+$('sLen').value;DB.settings.start=$('sStart').value;DB.settings.rounds=+$('sRounds').value;save();}));
+function homeError(m){show('home');$('homeMsg').textContent=m;$('homeMsg').hidden=false;}
 
-function nextSong(autoplay){
-  if(!S.deck.length)S.deck=shuffle(S.ids);
-  S.cur=S.deck.pop();S.revealed=false;S.seg=null;S.heard=0;S.seeked=false;S.first=false;
-  stopTimers();$('vheard').textContent='0.0 s';
-  ['vt','vc','vdur','vseek'].forEach(i=>$(i).textContent='–');$('vid').textContent=S.cur;
-  $('disc').querySelector('circle:nth-of-type(3)').setAttribute('fill','hsl('+Math.floor(Math.random()*360)+' 80% 55%)');
-  $('again').disabled=true;$('reveal').disabled=false;
-  try{S.player.cueVideoById(S.cur);}catch(e){}
-  log('Song gezogen: '+S.cur+' (Deck: '+S.deck.length+' übrig)');
-  if(autoplay)play();
+/* ---------- Spielablauf ---------- */
+function cfg(){return {len:+DB.settings.len,rnd:DB.settings.start==='random'};}
+function stopTimers(){clearTimeout(S.endT);S.endT=null;clearTimeout(S.wd);S.wd=null;}
+function resetRoundUI(){
+  stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}
+  $('inTitle').value='';$('inArtist').value='';$('rev').hidden=true;$('disc').classList.remove('spin');
+  $('label').setAttribute('fill','hsl('+Math.floor(Math.random()*360)+' 75% 55%)');
+  S.cur=null;S.seg=null;S.started=false;S.vd=null;S.revealed=false;S.parsed=null;S.first=false;S.seeked=false;
+  $('play').textContent='Abspielen';showPlayer(false);hud();
 }
-
-function cfg(){return {len:+$('len').value,rnd:$('start').value==='random'};}
-
+async function newSong(note){
+  setBusy(true);resetRoundUI();setStatus('Song wird ausgewählt …');
+  try{await ensurePlayer();const p=await pickSong();S.cur=p.vid;S.srcKey=p.key;setBusy(false);setStatus((note?note+' ':'')+'Tippe auf „Abspielen“.');}
+  catch(e){S.active=false;homeError(e.message);}
+}
+async function startGame(){
+  S.score=0;S.round=0;S.hist=[];S.bad={};S.active=true;
+  if(!activeSources().length){homeError('Keine aktive Playlist. Trag unter „Playlists verwalten“ eine URL ein.');return;}
+  show('game');await newSong();
+}
 function play(){
-  if(!S.cur||!S.player)return;
-  const c=cfg();S.first=true;S.seeked=false;S.heard=0;stopTimers();
-  try{if(c.rnd)S.player.mute();else S.player.unMute();}catch(e){}
-  S.player.loadVideoById(S.cur);
-  log('Abspielen: '+(c.rnd?'zufälliger Start (stumm)':'vom Anfang')+', Länge '+(c.len||'ganz'));
+  if(!S.cur||S.busy)return;
+  if(S.started&&S.seg!=null){replay();return;}
+  const c=cfg();S.first=true;S.seeked=false;stopTimers();
+  try{c.rnd?S.player.mute():S.player.unMute();}catch(e){}
+  S.player.loadVideoById(S.cur);S.started=true;$('play').textContent='Nochmal hören';
+  setStatus('lädt …');armWd();
 }
-
+function replay(){stopTimers();try{S.player.seekTo(S.seg,true);S.player.unMute();S.player.playVideo();}catch(e){}startSegment();}
+function armWd(){clearTimeout(S.wd);S.retry=0;S.wd=setTimeout(wdFire,8000);}
+function wdFire(){
+  if(!S.first)return;
+  if(S.retry<1){S.retry++;setStatus('lädt … (2. Versuch)');try{S.player.loadVideoById(S.cur);}catch(e){}S.wd=setTimeout(wdFire,8000);}
+  else{setStatus('Hängt – bitte nochmal „Abspielen“ tippen.');S.started=false;$('play').textContent='Abspielen';}
+}
+function updateInfo(){try{const d=S.player.getVideoData();if(d&&d.title)S.vd=d;}catch(e){}}
+function startSegment(){
+  const c=cfg();updateInfo();setStatus('spielt …');
+  if(!S.revealed)$('reveal').disabled=!S.vd;
+  if(c.len>0){clearTimeout(S.endT);S.endT=setTimeout(()=>{try{S.player.pauseVideo();}catch(e){}setStatus('Ausschnitt vorbei – rate!');},c.len*1000);}
+}
 function onState(e){
-  const st=e.data;const c=cfg();
-  if(st===1){ // PLAYING
+  const st=e.data,c=cfg();
+  if(st===1){
     $('disc').classList.add('spin');
     if(S.first){
-      S.first=false;
+      S.first=false;clearTimeout(S.wd);
       let d=0;try{d=S.player.getDuration();}catch(x){}
-      $('vdur').textContent=d?d.toFixed(0)+' s':'unbekannt (Live?)';
-      if(c.rnd&&d>0){
-        const max=Math.max(0,d-(c.len||0)-2);const t=Math.floor(Math.random()*max);
-        S.seg=t;$('vseek').textContent=t+' s';S.seeked=true;
-        log('seekTo('+t+')');S.player.seekTo(t,true);
-        return; // warten auf nächstes PLAYING, dann entstummen
-      }
-      S.seg=0;$('vseek').textContent='0 s';
-      startSegment();return;
+      if(c.rnd&&d>0){const t=Math.floor(Math.random()*Math.max(0,d-(c.len||0)-2));S.seg=t;S.seeked=true;S.player.seekTo(t,true);return;}
+      S.seg=0;startSegment();return;
     }
     if(S.seeked){S.seeked=false;try{S.player.unMute();}catch(x){}startSegment();return;}
-    if(!S.tickT)startTick();
-    updateInfo();
-  }else if(st===2||st===0){
-    $('disc').classList.remove('spin');
-    if(st===0)log('Song zu Ende');
-  }
+  }else if(st===2||st===0){$('disc').classList.remove('spin');}
 }
-
-function startSegment(){
-  const c=cfg();updateInfo();$('again').disabled=false;
-  startTick();
-  if(c.len>0){clearTimeout(S.endT);S.endT=setTimeout(()=>{try{S.player.pauseVideo();}catch(e){}log('Timer: Ausschnitt vorbei ('+c.len+' s)','ok');},c.len*1000);}
-}
-function startTick(){clearInterval(S.tickT);S.tickT=setInterval(()=>{let st=-1;try{st=S.player.getPlayerState();}catch(e){}if(st===1){S.heard+=0.2;$('vheard').textContent=S.heard.toFixed(1)+' s';}},200);}
-function stopTimers(){clearTimeout(S.endT);clearInterval(S.tickT);S.endT=null;S.tickT=null;}
-
-function updateInfo(){
-  try{const d=S.player.getVideoData();if(d&&d.video_id===S.cur||d&&d.title){S.vd=d;}}catch(e){}
-}
-
-function reveal(){
-  updateInfo();const d=S.vd||{};
-  $('vt').textContent=d.title||'(noch nicht verfügbar – erst abspielen)';$('vc').textContent=d.author||'–';
-  if(d.title)log('Aufgedeckt: '+d.title+' – '+d.author);
-}
-
 function onError(e){
-  const code=e.data;S.errors[code]=(S.errors[code]||0)+1;
-  const txt=ERR[code]||'Unbekannt';
-  $('verr').textContent=code+' – '+txt+' · gesamt: '+Object.entries(S.errors).map(([k,v])=>k+'×'+v).join(', ');$('verr').className='bad';
-  log('Fehler '+code+' ('+txt+') bei '+S.cur+' · Zähler: '+JSON.stringify(S.errors),'bad');
-  stopTimers();$('disc').classList.remove('spin');
-  if([2,5,100,101,150].includes(code)){
-    log('→ automatisch nächster Song');
-    setTimeout(()=>{nextSong(true);setTimeout(()=>{let st=-1;try{st=S.player.getPlayerState();}catch(x){}if(st!==1&&st!==3)log('Autoplay nach Fehler evtl. blockiert – bitte „Abspielen“ tippen','bad');},4000);},700);
-  }
+  const code=e.data;stopTimers();$('disc').classList.remove('spin');
+  if(ERRCODES.includes(code)){S.bad_vid=(S.bad_vid||0)+1;setTimeout(()=>newSong('Video nicht verfügbar (Fehler '+code+'), anderer Song gewählt.'),600);}
+  else setStatus('YouTube-Fehler '+code);
 }
-
-$('load').onclick=loadPlaylist;
+function reveal(){
+  updateInfo();if(!S.vd||!S.vd.title){setStatus('Erst einmal abspielen.');return;}
+  S.revealed=true;$('reveal').disabled=true;
+  const p=S.parsed=parseYT(S.vd.title,S.vd.author);
+  $('rTitle').textContent=S.vd.title;$('rChan').textContent=S.vd.author||'–';
+  $('rParsed').textContent=(p.artist?p.artist+' – ':'')+p.title+(p.artist?'':'  (Interpret ≈ Kanal: '+(p.channel||'–')+')');
+  $('ckTl').textContent='Titel richtig (+'+PTS.title+')';$('ckAl').textContent='Interpret richtig (+'+PTS.artist+')';
+  const j=judge($('inTitle').value,$('inArtist').value,p);
+  $('ckT').checked=j.title;$('ckA').checked=j.artist;ptsPrev();
+  $('rev').hidden=false;const last=DB.settings.rounds&&S.round+1>=DB.settings.rounds;$('nextBtn').textContent=last?'Ergebnis anzeigen':'Weiter';
+  showPlayer(true);setStatus('');
+  setTimeout(()=>$('rev').scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+function ptsPrev(){const n=($('ckT').checked?PTS.title:0)+($('ckA').checked?PTS.artist:0);$('ptsPrev').textContent='+'+n+' Punkte';return n;}
+function commit(){
+  const n=ptsPrev();S.score+=n;S.hist.push({yt:S.vd.title,by:S.vd.author,pts:n});S.round++;
+  if(DB.settings.rounds&&S.round>=DB.settings.rounds)endGame();else newSong();
+}
+function endGame(){
+  stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}S.active=false;
+  const max=S.hist.length*(PTS.title+PTS.artist);
+  $('endScore').textContent=S.score+' Punkte';$('endSub').textContent=S.hist.length?('aus '+S.hist.length+' Runden, maximal '+max+' möglich'):'keine Runde gewertet';
+  $('endList').innerHTML=S.hist.map(h=>`<li>${esc(h.yt)} <span class="sub">(${esc(h.by||'')})</span> – <b>${h.pts}</b></li>`).join('');
+  show('end');
+}
+$('startBtn').onclick=startGame;
 $('play').onclick=play;
-$('pause').onclick=()=>{try{S.player.pauseVideo();}catch(e){}};
-$('again').onclick=()=>{if(S.seg==null)return;const c=cfg();S.heard=0;try{S.player.seekTo(S.seg,true);S.player.unMute();S.player.playVideo();}catch(e){}stopTimers();startSegment();log('Nochmal hören ab '+S.seg+' s');};
-$('next').onclick=()=>nextSong(true);
+$('pause').onclick=()=>{try{S.player.pauseVideo();}catch(e){}stopTimers();setStatus('Pause');};
+$('showp').onclick=()=>showPlayer(!S.pshown);
+$('skip').onclick=()=>{if(!S.busy)newSong('Übersprungen.');};
 $('reveal').onclick=reveal;
-function togglePlayer(on){$('pw').classList.toggle('show',on);$('pclose').classList.toggle('show',on);$('showp').textContent=on?'Player verbergen':'Player anzeigen';}
-$('showp').onclick=()=>togglePlayer(!$('pw').classList.contains('show'));
-$('pclose').onclick=()=>togglePlayer(false);
+$('ckT').onchange=ptsPrev;$('ckA').onchange=ptsPrev;
+$('nextBtn').onclick=commit;
+$('endBtn').onclick=()=>{if(S.hist.length)endGame();else{S.active=false;stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}show('home');}};
+$('againBtn').onclick=startGame;
+$('menuBtn').onclick=()=>show('home');
+
+/* ---------- Playlist-Verwaltung ---------- */
+function renderPl(){
+  $('discard').checked=DB.pl.discardDefaults;
+  const src=sources();
+  $('plList').innerHTML=src.length?src.map(s=>{
+    const c=DB.idCache[parseId(s.url)||''];const info=c&&c.ids?c.ids.length+' Videos (geprüft)':(s.hasUrl?'noch nicht geprüft':'leer');
+    const head=`<label class="chk" style="margin:0"><input type="checkbox" data-a="on" data-k="${esc(s.key)}" ${s.on?'checked':''}> <b>${esc(s.genreName)} – ${esc(s.name)}</b></label>`;
+    let body='';
+    if(s.custom)body=`<input type="text" data-a="cname" data-k="${esc(s.key)}" value="${esc(s.name)}" placeholder="Name"><input type="url" data-a="curl" data-k="${esc(s.key)}" value="${esc(s.url)}" placeholder="YouTube-Playlist-URL">`;
+    else if(s.first)body=`<input type="url" data-a="ovr" data-g="${esc(s.genre)}" value="${esc(DB.pl.override[s.genre]||'')}" placeholder="${esc(s.defUrl||'eigene URL (Standard ist leer)')}">`;
+    else body=`<div class="sub">${esc(s.url)}</div>`;
+    return `<div class="pl">${head}${body}<div class="row"><button class="sec small" data-a="check" data-k="${esc(s.key)}">Prüfen</button>${s.custom?`<button class="sec small" data-a="del" data-k="${esc(s.key)}">Löschen</button>`:''}</div><div class="sub" id="pst-${esc(s.key)}">${esc(info)}</div></div>`;
+  }).join(''):'<span class="sub">Keine Playlists. Füge unten eine hinzu.</span>';
+}
+$('discard').onchange=()=>{DB.pl.discardDefaults=$('discard').checked;save();renderPl();};
+$('plList').addEventListener('change',e=>{
+  const a=e.target.dataset.a,k=e.target.dataset.k;if(!a)return;
+  if(a==='on'){if(k.startsWith('c:')){const c=DB.pl.custom.find(x=>'c:'+x.id===k);if(c)c.on=e.target.checked;}else{if(e.target.checked)delete DB.pl.off[k];else DB.pl.off[k]=true;}}
+  else if(a==='ovr'){const v=e.target.value.trim();if(v&&!parseId(v)){e.target.value='';alert('Keine gültige Playlist-URL.');return;}if(v)DB.pl.override[e.target.dataset.g]=v;else delete DB.pl.override[e.target.dataset.g];}
+  else if(a==='cname'||a==='curl'){const c=DB.pl.custom.find(x=>'c:'+x.id===k);if(c){if(a==='cname')c.name=e.target.value.trim()||'Ohne Namen';else{const v=e.target.value.trim();if(v&&!parseId(v)){alert('Keine gültige Playlist-URL.');return;}c.url=v;}}}
+  save();renderPl();
+});
+$('plList').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;const a=b.dataset.a,k=b.dataset.k;
+  if(a==='del'){DB.pl.custom=DB.pl.custom.filter(x=>'c:'+x.id!==k);save();renderPl();}
+  else if(a==='check'){
+    const s=sources().find(x=>x.key===k);if(!s)return;const el=document.getElementById('pst-'+k);const id=parseId(s.url);
+    if(!id){el.textContent='keine URL';el.className='sub msg';return;}
+    el.textContent='prüfe …';el.className='sub';b.disabled=true;
+    try{const ids=await ensureIds(id,true);delete S.bad[k];el.textContent='✓ '+ids.length+' Videos';el.className='sub';}
+    catch(err){el.textContent='✗ '+err.message;el.className='sub msg';}
+    b.disabled=false;
+  }
+});
+$('addBtn').onclick=()=>{
+  const n=$('addName').value.trim(),u=$('addUrl').value.trim(),m=$('addMsg');
+  if(!parseId(u)){m.textContent='Das ist keine gültige Playlist-URL (es fehlt „list=…“).';m.hidden=false;return;}
+  DB.pl.custom.push({id:Date.now().toString(36),name:n||'Eigene Playlist',url:u,on:true});save();
+  $('addName').value='';$('addUrl').value='';m.hidden=true;renderPl();
+};
+$('plBtn').onclick=()=>show('plmgr');
+$('plBack').onclick=()=>show('home');
+
+/* ---------- Hilfe ---------- */
+$('helpBtn').onclick=()=>$('helpBg').hidden=false;
+$('helpClose').onclick=()=>$('helpBg').hidden=true;
+$('helpBg').addEventListener('click',e=>{if(e.target.id==='helpBg')$('helpBg').hidden=true;});
 
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
-window.__sg={S:S,loadPlaylist:loadPlaylist};
+renderHome();
+window.__sg={S:S,DB:function(){return DB},parseYT,judge,cleanTitle,norm,scoreTitle,scoreArtist};
 })();
 </script>
 </body>

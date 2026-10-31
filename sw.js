@@ -1,7 +1,7 @@
 // Song Guessr Service Worker – Network-first (du bearbeitest playlists.js oft), Cache als Offline-Fallback.
 const PREFIX = 'songguessr-';
-const CACHE = PREFIX + 'v0';
-const SHELL = ['./', 'index.html', 'playlists.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
+const CACHE = PREFIX + 'v1';
+const SHELL = ['./', 'index.html', 'test.html', 'playlists.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
