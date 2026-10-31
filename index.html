@@ -22,6 +22,8 @@ input[type=text],input[type=url],select{font:inherit;color:var(--text);min-heigh
 button{font:inherit;min-height:52px;border-radius:14px;border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;padding:8px 14px;width:100%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .ic{width:20px;height:20px;flex:none}
 button.sec{background:var(--bg);color:var(--text);border:1px solid var(--border);font-weight:600}
+button.warn{background:var(--bad);animation:pulse .8s ease-in-out infinite alternate}
+@keyframes pulse{to{box-shadow:0 0 0 7px rgba(196,38,46,.35)}}
 button.link{background:none;border:0;color:var(--muted);text-decoration:underline;min-height:36px;font-size:.82rem;font-weight:500;width:auto;padding:4px 10px}
 button.small{min-height:40px;font-size:.9rem;font-weight:500}
 button:disabled{opacity:.4}
@@ -35,7 +37,7 @@ button:disabled{opacity:.4}
 .chk{display:flex;align-items:center;gap:10px;color:var(--text);font-size:1rem;margin:10px 0;min-height:44px}
 .chk input{width:26px;height:26px;flex:none}
 .msg{color:var(--bad);margin-top:8px;font-size:.92rem}
-#tt{display:block;width:min(92vw,380px);margin:4px auto 8px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
+#tt{cursor:pointer;display:block;width:min(92vw,380px);margin:4px auto 8px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
 #rec{transform-box:view-box;transform-origin:140px 128px}
 #tt.loading #rec,#tt.playing #rec{animation:sp 1.8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -74,7 +76,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <h2>Modus</h2>
     <div class="chips"><button class="chip" id="mSolo" aria-pressed="true">Solo</button><button class="chip" id="mFriends" aria-pressed="false">Freunde (ein Gerät)</button></div>
     <div id="namesBox" hidden>
-      <div class="sub" style="margin-top:8px">Namen eintragen (2 bis 8). Pro Runde wählst du, wer zuerst richtig geraten hat.</div>
+      <div class="sub" style="margin-top:8px">Namen eintragen (2 bis 12). Pro Runde wählst du, wer zuerst richtig geraten hat.</div>
       <div id="names"></div>
       <div class="row"><button class="sec small" id="addPerson">+ Person</button></div>
     </div>
@@ -95,7 +97,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <div class="msg" id="homeMsg" hidden></div>
     <div class="row"><button class="sec" id="plBtn">Playlists verwalten</button></div>
   </div>
-  <div class="sub ver">Song Guessr v1.2 (Etappe 2) · <a href="test.html">Testseite</a></div>
+  <div class="sub ver">Song Guessr v1.3 (Etappe 2) · <a href="test.html">Testseite</a></div>
 </section>
 
 <!-- ============ GAME ============ -->
@@ -132,9 +134,9 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <input type="text" id="inTitle" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
     <label for="inArtist">Interpret</label>
     <input type="text" id="inArtist" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    <div id="whoWrap" hidden><label for="who">Wer hat zuerst geraten?</label><select id="who"></select></div>
     <div class="row"><button id="play" data-ic="play"><span class="t">Abspielen</span></button><button class="sec" id="pause" data-ic="pause"><span class="t">Pause</span></button></div>
     <div class="row"><button class="sec" id="showp" data-ic="video"><span class="t">Player anzeigen</span></button></div>
-    <div id="whoWrap" hidden><label for="who">Wer hat zuerst geraten?</label><select id="who"></select></div>
     <div class="row"><button id="reveal" disabled data-ic="eye"><span class="t">Aufdecken</span></button></div>
     <div class="sub" style="margin-top:6px">Aufdecken geht, sobald der Song einmal gespielt hat.</div>
     <div style="text-align:center;margin-top:4px"><button class="link" id="skip">Hängt? Anderen Song laden</button></div>
@@ -147,7 +149,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <label class="chk"><input type="checkbox" id="ckA"> <span id="ckAl"></span></label>
     <div class="sub">Haken sind vorbelegt (ähnlicher Abgleich), du kannst sie korrigieren.</div>
     <div class="big" id="ptsPrev"></div>
-    <div class="msg" id="whoMsg" hidden>Bitte oben wählen, wer zuerst geraten hat (oder „niemand“).</div>
+    <div class="msg" id="whoMsg" hidden>Wenn nichts gewählt wird, wird für niemand ein Punkt vergeben. Zum Bestätigen nochmal tippen.</div>
     <div class="row"><button id="nextBtn" data-ic="arrow"><span class="t">Weiter</span></button></div>
   </div>
 </section>
@@ -187,12 +189,12 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
   <div class="top"><h2 style="margin:0">So geht's</h2><button class="sec small" id="helpClose">Schließen</button></div>
   <h3>Spielablauf</h3>
   <ol><li>Genres wählen (oder nichts = gemischt), Länge, Start und Rundenzahl einstellen, Spiel starten.</li>
-  <li>Auf <b>Abspielen</b> tippen: der Song läuft versteckt, die Platte dreht sich. <b>Nochmal hören</b> wiederholt denselben Ausschnitt.</li>
+  <li>Auf <b>Abspielen</b> tippen: der Song läuft versteckt, die Platte dreht sich (Tipp auf den Plattenspieler = Pause). <b>Nochmal hören</b> wiederholt denselben Ausschnitt.</li>
   <li>Titel und Interpret eintippen, dann <b>Aufdecken</b>. Du siehst YouTube-Titel und Kanal, die Haken sind vorbelegt und von dir änderbar.</li>
   <li><b>Weiter</b> bucht die Punkte und startet die nächste Runde (wieder per Tipp auf Abspielen).</li></ol>
   <h3>Punkte</h3>
   <p>Titel richtig: <b>2</b> Punkte, Interpret richtig: <b>1</b> Punkt. Der Abgleich ist tolerant: Groß/Klein, Akzente, Reihenfolge und kleine Tippfehler sind egal. Steht in beiden Feldern derselbe Text, zählt er nur einmal. Hinweise und Zeitbonus kommen in einer späteren Version.</p>
-  <h3>Freunde-Modus</h3><p>Im Modus „Freunde (ein Gerät)“ trägst du 2 bis 8 Namen ein. Pro Runde wählst du im Feld „Wer hat zuerst geraten?“ die Person (oder „niemand“), die Punkte gehen an sie. Am Ende gibt es Rangliste, Sieger oder Gleichstand.</p><h3>Player / Werbung</h3><p>„Hängt? Anderen Song laden“ ist nur der Notknopf, falls ein Song nicht startet.</p>
+  <h3>Freunde-Modus</h3><p>Im Modus „Freunde (ein Gerät)“ trägst du 2 bis 12 Namen ein. Pro Runde wählst du im Feld „Wer hat zuerst geraten?“ die Person (oder „niemand“), die Punkte gehen an sie. Wählst du niemanden und es gibt Punkte, warnt der rote Weiter-Knopf einmal, beim zweiten Tippen gilt „niemand“. Am Ende gibt es Rangliste, Sieger oder Gleichstand.</p><h3>Player / Werbung</h3><p>„Hängt? Anderen Song laden“ ist nur der Notknopf, falls ein Song nicht startet.</p>
   <p><b>Player anzeigen</b> blendet das Video ein, damit du Werbung wegklicken kannst. Werbung automatisch zu erkennen geht nicht.</p>
   <p>Beste Nutzung mit Adblocker. Beobachtet: <b>Chrome</b> zeigt bei jedem Song Werbung, <b>Brave</b> blockt sie von selbst. Auch <b>Firefox mit uBlock Origin</b> sollte gehen (nicht geprüft). Ob der Blocker im <i>installierten</i> App-Fenster (PWA) greift, ist offen.</p>
   <h3>Playlists</h3>
@@ -359,19 +361,19 @@ function homeError(m){show('home');$('homeMsg').textContent=m;$('homeMsg').hidde
 function renderMode(){const f=DB.settings.mode==='friends';$('mSolo').setAttribute('aria-pressed',String(!f));$('mFriends').setAttribute('aria-pressed',String(f));$('namesBox').hidden=!f;if(f)renderNames();}
 function renderNames(){const st=DB.settings;if(!Array.isArray(st.names))st.names=[];while(st.names.length<2)st.names.push('');
   $('names').innerHTML=st.names.map((n,i)=>`<div class="row" style="margin-top:6px"><input type="text" data-i="${i}" value="${esc(n)}" placeholder="Name ${i+1}" maxlength="20" autocomplete="off"><button class="sec small" data-rm="${i}" style="flex:0 0 48px" aria-label="Entfernen" ${st.names.length<=2?'disabled':''}>✕</button></div>`).join('');
-  $('addPerson').disabled=st.names.length>=8;}
+  $('addPerson').disabled=st.names.length>=12;}
 $('mSolo').onclick=()=>{DB.settings.mode='solo';save();renderMode();};
 $('mFriends').onclick=()=>{DB.settings.mode='friends';save();renderMode();};
 $('names').addEventListener('input',e=>{const i=e.target.dataset.i;if(i!=null){DB.settings.names[+i]=e.target.value;save();}});
 $('names').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;DB.settings.names.splice(+b.dataset.rm,1);save();renderNames();});
-$('addPerson').onclick=()=>{if(DB.settings.names.length<8){DB.settings.names.push('');save();renderNames();}};
+$('addPerson').onclick=()=>{if(DB.settings.names.length<12){DB.settings.names.push('');save();renderNames();}};
 
 /* ---------- Spielablauf ---------- */
 function cfg(){return {len:+DB.settings.len,rnd:DB.settings.start==='random'};}
 function stopTimers(){clearTimeout(S.endT);S.endT=null;clearTimeout(S.wd);S.wd=null;}
 function resetRoundUI(){
   stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}
-  $('inTitle').value='';$('inArtist').value='';$('rev').hidden=true;setTT('idle');$('who').value='';$('whoMsg').hidden=true;
+  $('inTitle').value='';$('inArtist').value='';$('rev').hidden=true;setTT('idle');$('who').value='';$('whoMsg').hidden=true;S.warned=false;$('nextBtn').classList.remove('warn');
   $('label').setAttribute('fill','hsl('+Math.floor(Math.random()*360)+' 75% 55%)');
   S.cur=null;S.seg=null;S.started=false;S.vd=null;S.revealed=false;S.parsed=null;S.first=false;S.seeked=false;
   setPlayBtn(false);showPlayer(false);hud();
@@ -451,9 +453,11 @@ function reveal(){
 }
 function ptsPrev(){const n=($('ckT').checked?PTS.title:0)+($('ckA').checked?PTS.artist:0);$('ptsPrev').textContent='+'+n+' Punkte';return n;}
 function commit(){
-  let who='';
-  if(S.friends){who=$('who').value;if(!who){$('whoMsg').hidden=false;$('who').scrollIntoView({block:'center'});return;}}
-  const n=ptsPrev();let got=n;
+  let who='';const n=ptsPrev();
+  if(S.friends){who=$('who').value;if(!who){
+    if(n>0&&!S.warned){S.warned=true;$('whoMsg').hidden=false;$('nextBtn').classList.add('warn');return;}
+    who='__none';$('who').value='__none';}}
+  let got=n;
   if(S.friends){if(who==='__none')got=0;else S.scores[who]+=n;}else S.score+=n;
   S.hist.push({yt:S.vd.title,by:S.vd.author,pts:got,who:S.friends?(who==='__none'?'niemand':who):''});S.round++;
   if(DB.settings.rounds&&S.round>=DB.settings.rounds)endGame();else newSong();
@@ -477,11 +481,12 @@ $('startBtn').onclick=startGame;
 $('play').onclick=play;
 $('pause').onclick=()=>{try{S.player.pauseVideo();}catch(e){}stopTimers();setStatus('Pause');};
 $('showp').onclick=()=>showPlayer(!S.pshown);
+$('tt').onclick=()=>{if(S.busy||!S.started)return;$('pause').click();};
 $('skip').onclick=()=>{if(!S.busy)newSong('Anderer Song geladen.');};
 $('reveal').onclick=reveal;
 $('ckT').onchange=ptsPrev;$('ckA').onchange=ptsPrev;
 $('nextBtn').onclick=commit;
-$('who').onchange=()=>{$('whoMsg').hidden=true;};
+$('who').onchange=()=>{$('whoMsg').hidden=true;$('nextBtn').classList.remove('warn');S.warned=false;};
 $('endBtn').onclick=()=>{if(S.hist.length)endGame();else{S.active=false;stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}show('home');}};
 $('againBtn').onclick=startGame;
 $('menuBtn').onclick=()=>show('home');
