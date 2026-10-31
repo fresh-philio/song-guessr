@@ -9,20 +9,29 @@
 window.SG_PLAYLISTS = {
   genres: [
     { id: 'kinderserien', name: 'Kinderserien-Intros', playlists: [
-      { name: '(noch leer)', url: '', status: 'offen' } ] },
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLc6OoqL0xc0aKOQunbVrG9xlSfkTeflhe', status: 'ungeprüft (von Phil)' } ] },
     { id: 'film', name: 'Film-Titelmelodien', playlists: [
-      // Echte URL aus einem Uni-Blog (Parsons Playlists: Movie Music). Vermutlich KLEIN (Dutzende Titel), nur zum Testen.
-      { name: 'Movie Music (Richmond, klein)', url: 'https://youtube.com/playlist?list=PLU94rco57ZewCfuxxV4Gk3YIhi4ez0R4E', status: 'ungeprüft' } ] },
-    { id: 'pop',      name: 'Pop',                   playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: 'oldies',   name: 'Oldies',                playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: 'rap',      name: 'Rap',                   playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: 'charts',   name: 'Charts',                playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: '80er',     name: '80er',                  playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: '90er',     name: '90er',                  playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: '2000er',   name: '2000er',                playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: 'rock',     name: 'Rock',                  playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: 'deutsch',  name: 'Deutsch (Pop/Schlager)',playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] },
-    { id: 'games',    name: 'Videospiel-Musik',      playlists: [{ name: '(noch leer)', url: '', status: 'offen' }] }
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PL4BrNFx1j7E5qDxSPIkeXgBqX0J7WaB2a', status: 'ungeprüft (von Phil)' } ] },
+    { id: 'pop', name: 'Pop', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLplXQ2cg9B_qrCVd1J_iId5SvP8Kf_BfS', status: 'ungeprüft (von Phil)' } ] },
+    { id: 'oldies', name: 'Oldies', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLbnusB-ofiRuLUb2i6YnqDR0m-yjof1rS', status: 'ungeprüft (von Phil)' } ] },
+    { id: 'rap', name: 'Rap', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLqsBPTegBGMG3acuRYMLpDvgC-5esWrZA', status: 'ungeprüft (von Phil)' } ] },
+    { id: 'charts', name: 'Charts', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PL3-sRm8xAzY9sDilvaWjCwCI0TkUzYdOG', status: 'ungeprüft (von Phil)' } ] },
+    { id: '80er', name: '80er', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLd5xnond3B5Q76AHn0yU7iuCU5j7b4DLi', status: 'ungeprüft (von Phil)' } ] },
+    { id: '90er', name: '90er', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLYVjGTi85afou-GAHkhC6OgU7Merg0G0B', status: 'ungeprüft (von Phil)' } ] },
+    { id: '2000er', name: '2000er', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLDef6fout0FTkoIXW_DtGHGBtoL7F_JRK', status: 'ungeprüft (von Phil)' } ] },
+    { id: 'rock', name: 'Rock', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLVQ7g3e6O27cH8KG9mktLWH8zcqiwTntP', status: 'ungeprüft (von Phil)' } ] },
+    { id: 'deutsch', name: 'Deutsch (Pop/Schlager)', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLw-VjHDlEOgtwFlySm1JHphU3j8wUtSlu', status: 'ungeprüft (von Phil)' } ] },
+    { id: 'games', name: 'Videospiel-Musik', playlists: [
+      { name: 'Standard', url: 'https://youtube.com/playlist?list=PLT2CRsQGmDARh_T7Dtg8T75iSrcLtTnVz', status: 'ungeprüft (von Phil)' } ] }
   ],
   // Rauschen im YouTube-Titel (Regex-Quellen, Groß/Klein egal), wird vor dem Abgleich entfernt.
   // Klammern mit Wörtern wie official/video/audio/lyric/remaster/HD/4K werden zusätzlich automatisch entfernt.

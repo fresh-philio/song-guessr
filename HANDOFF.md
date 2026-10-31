@@ -1,4 +1,4 @@
-# Song Guessr – HANDOFF (Stand: Etappe 1 fertig, wartet auf Handy-Test)
+# Song Guessr – HANDOFF (Stand: v1.2 = Etappe 1 + Feedback + Etappe 2, wartet auf Handy-Test)
 
 ## Projekt
 PWA-Handyspiel: versteckter YouTube-Song, Titel+Interpret raten, Punkte. Phil (Webentwickler), informelles Deutsch, Free-Limit knapp: sparsam arbeiten, Edit statt Neuschreiben, kein Zwischengelaber. Auslieferung als ZIP per SendUserFile, Hosting GitHub Pages (Repo "song-guessr", Upload über "Add file", Dateien überschreiben sich), Test auf Android (Brave). Nicht als Claude-Artifact (YouTube-Embeds gesperrt).
@@ -19,6 +19,19 @@ localStorage "songguessr-v1": settings{len,start,rounds,genres}, pl{discardDefau
 - Hilfe: Ablauf, Punkte, Player/Werbung (Chrome zeigt bei jedem Song Werbung, Brave blockt sie – von Phil getestet; Firefox+uBlock ungeprüft; PWA-Fenster offen).
 - Architektur: Hauptplayer ohne Playlist (nur loadVideoById), Playlist-IDs über kurzlebige Temp-Player (getPlaylist), danach destroy.
 
+## Änderungen v1.2 (nach Phils Test von v1.0)
+- Test v1.0: "macht schon Spaß", Bedienbarkeit gut, aber optisch "sehr nach Programm". Fehler 150 trat 2x auf.
+- Fehler 2/5/100/101/150 → automatisch nächster Song UND automatischer Start (setzt auf "sticky activation" nach dem ersten Tipp; max. 4 Fehler in Folge, dann Meldung). UNGEPRÜFT am Handy.
+- Icons (Inline-SVG, currentColor) an Abspielen/Nochmal hören/Pause/Player/Aufdecken/Weiter/Start.
+- "Überspringen" → kleiner Link-Notknopf "Hängt? Anderen Song laden" (Phil: sonst wird damit geskippt; Punktabzug fürs Skippen wäre die Alternative, bisher nicht gebaut).
+- Look: Gradient-Hintergrund (hell: Pfirsich/Lila/Blau, dunkel: Violett-Glow), Glas-Karten, Gradient-Buttons, Logo-Platte.
+- Plattenspieler-SVG (#tt) statt einzelner Platte: Nadel schwenkt beim Laden auf die Platte (leichtes Wackeln), bleibt beim Abspielen, hebt bei Pause/Ende ab, LED leuchtet, Platte dreht bei loading/playing. Zustände per setTT('idle'|'loading'|'playing'). Phils Idee "Plattenspieler als Hintergrund" bewusst als Held-Element im Spielscreen umgesetzt statt als Vollbild-Hintergrund (ruhiger). Weiterer Look-Ausbau evtl. in Etappe 3.
+
+## Stand Etappe 2: Freunde-Modus (Headless-Test 18/18 grün)
+- Home: Modus Solo | Freunde (ein Gerät), 2-8 Namen (Duplikate/zu wenige → Meldung), in localStorage (settings.mode, settings.names).
+- Spiel: Select "Wer hat zuerst geraten?" (bitte wählen / Namen / niemand), Pflicht vor Weiter. Punkte der Runde (Haken-Summe) an die gewählte Person, "niemand" = 0. HUD-Zeile mit Scoreboard.
+- Ende: Sieger (🏆) oder "Gleichstand: A & B", Rangliste, Rundenliste mit Person.
+
 ## UNGEPRÜFT (echte Wiedergabe nicht möglich)
 - Hauptplayer ohne Playlist/Video erzeugen + loadVideoById (war in Etappe 0 mit Playlist-Player bewiesen, hier neu).
 - Temp-Player pro Playlist erzeugen/zerstören mehrfach hintereinander.
@@ -32,6 +45,6 @@ localStorage "songguessr-v1": settings{len,start,rounds,genres}, pl{discardDefau
 
 ## Nächste Schritte
 1. Phil testet Etappe 1 am Handy, meldet Probleme (Spielfluss, Abgleich-Treffer, Playlist-Verwaltung, Hauptplayer).
-2. Etappe 2: Freunde-Modus (Namen, Rundenzahl, Select "Wer hat zuerst geraten" inkl. "niemand", Punkte an Person, Sieger/Gleichstand).
+2. Phil testet v1.2 (Freunde-Modus, Fehler-Autoplay, Plattenspieler).
 3. Etappe 3: Hinweise (−1 je, konfigurierbar: Genre/Playlist-Name, Buchstaben/Wörter, erste ~10 %, Video einblenden), Zeitbonus (3 s ×3, 10 s ×2, 20 s ×1,5, ganz ×1 sinkend, an/aus), Icon-Feinschliff, Verlauf. Punkte nie unter 0.
 HANDOFF.md nach jeder Etappe aktualisieren.

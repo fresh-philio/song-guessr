@@ -8,19 +8,21 @@
 <link rel="icon" href="icon-192.png">
 <title>Song Guessr</title>
 <style>
-:root{--bg:#f6f4fb;--surface:#fff;--text:#1d1a2b;--muted:#6b6780;--accent:#6c3df5;--accent-text:#fff;--border:#d9d4ea;--ok:#13804a;--bad:#c4262e;--chip:#ece8f8}
-@media (prefers-color-scheme:dark){:root{--bg:#14121f;--surface:#201d33;--text:#f0edfa;--muted:#a29cbc;--accent:#8e6bff;--accent-text:#14121f;--border:#38334f;--ok:#4cd08a;--bad:#ff7a82;--chip:#2b2745}}
+:root{--page:linear-gradient(165deg,#ffe0cc 0%,#ecdcff 45%,#cde2ff 100%);--bg:#f4eefc;--surface:rgba(255,255,255,.86);--text:#1d1a2b;--muted:#6b6780;--accent:#7a3df0;--accent2:#ff4fa3;--accent-text:#fff;--border:#d9cdee;--ok:#13804a;--bad:#c4262e;--chip:#efe6ff}
+@media (prefers-color-scheme:dark){:root{--page:radial-gradient(800px 480px at 85% -5%,rgba(150,60,200,.38),transparent 60%),radial-gradient(700px 520px at 0% 100%,rgba(50,90,200,.30),transparent 60%),#0f0c19;--bg:#171326;--surface:rgba(36,30,60,.88);--text:#f0edfa;--muted:#a9a2c4;--accent:#9b6bff;--accent2:#ff5fae;--accent-text:#fff;--border:#3c3558;--ok:#4cd08a;--bad:#ff7a82;--chip:#2d2748}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,sans-serif;padding:12px max(14px,env(safe-area-inset-right)) 48px max(14px,env(safe-area-inset-left));max-width:520px;margin-inline:auto;position:relative}
-h1{font-size:1.5rem;margin:6px 0}
+body{margin:0;background:var(--page);background-attachment:fixed;min-height:100vh;color:var(--text);font:16px/1.4 system-ui,sans-serif;padding:12px max(14px,env(safe-area-inset-right)) 48px max(14px,env(safe-area-inset-left));max-width:520px;margin-inline:auto;position:relative}
+h1{font-size:1.6rem;margin:6px 0;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 h2{font-size:1.1rem;margin:0 0 8px}
 .sub{color:var(--muted);font-size:.85rem}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:14px;margin-bottom:12px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(40,10,80,.14)}
 label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px}
 input[type=text],input[type=url],select{font:inherit;color:var(--text);min-height:50px;border-radius:12px;border:1px solid var(--border);background:var(--bg);padding:8px 12px;width:100%}
-button{font:inherit;min-height:52px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-text);font-weight:600;padding:8px 14px;width:100%;cursor:pointer}
-button.sec{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+button{font:inherit;min-height:52px;border-radius:14px;border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;padding:8px 14px;width:100%;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.ic{width:20px;height:20px;flex:none}
+button.sec{background:var(--bg);color:var(--text);border:1px solid var(--border);font-weight:600}
+button.link{background:none;border:0;color:var(--muted);text-decoration:underline;min-height:36px;font-size:.82rem;font-weight:500;width:auto;padding:4px 10px}
 button.small{min-height:40px;font-size:.9rem;font-weight:500}
 button:disabled{opacity:.4}
 .row{display:flex;gap:8px;margin-top:10px}.row>*{flex:1}
@@ -33,8 +35,18 @@ button:disabled{opacity:.4}
 .chk{display:flex;align-items:center;gap:10px;color:var(--text);font-size:1rem;margin:10px 0;min-height:44px}
 .chk input{width:26px;height:26px;flex:none}
 .msg{color:var(--bad);margin-top:8px;font-size:.92rem}
-#disc{width:min(62vw,240px);height:min(62vw,240px);display:block;margin:6px auto}
-#disc.spin{animation:sp 2s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+#tt{display:block;width:min(92vw,380px);margin:4px auto 8px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
+#rec{transform-box:view-box;transform-origin:140px 128px}
+#tt.loading #rec,#tt.playing #rec{animation:sp 1.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#arm,#armw{transform-box:view-box;transform-origin:262px 40px}
+#arm{transform:rotate(-18deg);transition:transform .9s cubic-bezier(.35,.1,.2,1)}
+#tt.loading #arm{transform:rotate(0deg)}
+#tt.playing #arm{transform:rotate(3deg)}
+#tt.loading #armw{animation:wob .45s ease-in-out infinite alternate}
+@keyframes wob{from{transform:rotate(-1deg)}to{transform:rotate(1deg)}}
+#led{fill:#4a4a55;transition:fill .3s}#tt.playing #led,#tt.loading #led{fill:#ff4fa3}
+.logo{animation:sp 6s linear infinite;flex:none}
 #status{text-align:center;min-height:1.5em;color:var(--muted);margin:2px 0 6px}
 #hud{font-weight:600}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.95rem}.kv b{color:var(--muted);font-weight:500}
@@ -57,7 +69,16 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
 
 <!-- ============ HOME ============ -->
 <section id="home">
-  <div class="top"><h1>🎵 Song Guessr</h1><button class="sec small" id="helpBtn" aria-label="Hilfe">?</button></div>
+  <div class="top"><h1><svg class="logo" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#17171c"/><circle cx="20" cy="20" r="13" fill="none" stroke="#33333f"/><circle cx="20" cy="20" r="7" fill="#ff4fa3"/><circle cx="20" cy="20" r="1.5" fill="#17171c"/></svg>Song Guessr</h1><button class="sec small" id="helpBtn" aria-label="Hilfe">?</button></div>
+  <div class="card">
+    <h2>Modus</h2>
+    <div class="chips"><button class="chip" id="mSolo" aria-pressed="true">Solo</button><button class="chip" id="mFriends" aria-pressed="false">Freunde (ein Gerät)</button></div>
+    <div id="namesBox" hidden>
+      <div class="sub" style="margin-top:8px">Namen eintragen (2 bis 8). Pro Runde wählst du, wer zuerst richtig geraten hat.</div>
+      <div id="names"></div>
+      <div class="row"><button class="sec small" id="addPerson">+ Person</button></div>
+    </div>
+  </div>
   <div class="card">
     <h2>Genres</h2>
     <div class="sub">Nichts gewählt = gemischt aus allen aktiven Playlists.</div>
@@ -70,26 +91,40 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     </div>
     <label for="sRounds">Runden</label>
     <select id="sRounds"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="0">endlos</option></select>
-    <div class="row"><button id="startBtn">Spiel starten (Solo)</button></div>
+    <div class="row"><button id="startBtn" data-ic="play"><span class="t">Spiel starten</span></button></div>
     <div class="msg" id="homeMsg" hidden></div>
     <div class="row"><button class="sec" id="plBtn">Playlists verwalten</button></div>
   </div>
-  <div class="sub ver">Song Guessr v1.0 (Etappe 1) · <a href="test.html">Testseite</a></div>
+  <div class="sub ver">Song Guessr v1.2 (Etappe 2) · <a href="test.html">Testseite</a></div>
 </section>
 
 <!-- ============ GAME ============ -->
 <section id="game" hidden>
-  <div class="top"><div id="hud">Runde 1 · 0 Punkte</div><button class="sec small" id="endBtn">Beenden</button></div>
-  <svg id="disc" viewBox="0 0 200 200" aria-label="Schallplatte mit Fragezeichen">
-    <circle cx="100" cy="100" r="97" fill="#17171c"/>
-    <circle cx="100" cy="100" r="88" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
-    <circle cx="100" cy="100" r="78" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
-    <circle cx="100" cy="100" r="68" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
-    <circle cx="100" cy="100" r="58" fill="none" stroke="#2d2d37" stroke-width="1.5"/>
-    <path d="M100 8 A92 92 0 0 1 192 100" fill="none" stroke="#fff" stroke-opacity=".10" stroke-width="6" stroke-linecap="round"/>
-    <circle id="label" cx="100" cy="100" r="44" fill="hsl(280 75% 55%)"/>
-    <text x="100" y="118" text-anchor="middle" font-size="52" font-weight="800" fill="#fff" font-family="system-ui,sans-serif">?</text>
-    <circle cx="100" cy="100" r="4" fill="#17171c"/>
+  <div class="top"><div><div id="hud">Runde 1 · 0 Punkte</div><div id="scores" class="sub" hidden></div></div><button class="sec small" id="endBtn">Beenden</button></div>
+  <svg id="tt" viewBox="0 0 300 250" aria-label="Plattenspieler mit Schallplatte">
+    <defs><linearGradient id="wood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a3a4c"/><stop offset="1" stop-color="#241824"/></linearGradient></defs>
+    <rect x="4" y="4" width="292" height="242" rx="22" fill="url(#wood)" stroke="#7a566a" stroke-width="2"/>
+    <circle cx="140" cy="128" r="113" fill="#2e2a38"/>
+    <g id="rec">
+      <circle cx="140" cy="128" r="106" fill="#14141a"/>
+      <circle cx="140" cy="128" r="96" fill="none" stroke="#2b2b36" stroke-width="1.5"/>
+      <circle cx="140" cy="128" r="84" fill="none" stroke="#2b2b36" stroke-width="1.5"/>
+      <circle cx="140" cy="128" r="72" fill="none" stroke="#2b2b36" stroke-width="1.5"/>
+      <circle cx="140" cy="128" r="60" fill="none" stroke="#2b2b36" stroke-width="1.5"/>
+      <path d="M140 26 A102 102 0 0 1 242 128" fill="none" stroke="#fff" stroke-opacity=".10" stroke-width="7" stroke-linecap="round"/>
+      <circle id="label" cx="140" cy="128" r="42" fill="hsl(280 75% 55%)"/>
+      <text x="140" y="146" text-anchor="middle" font-size="50" font-weight="800" fill="#fff" font-family="system-ui,sans-serif">?</text>
+      <circle cx="140" cy="128" r="3.5" fill="#14141a"/>
+    </g>
+    <circle cx="262" cy="40" r="19" fill="#3a3a46" stroke="#6a6a78" stroke-width="2"/>
+    <g id="arm"><g id="armw">
+      <line x1="262" y1="40" x2="271" y2="10" stroke="#9a9aa8" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="272" cy="9" r="8" fill="#80808c"/>
+      <line x1="262" y1="40" x2="215" y2="186" stroke="#e2e2ec" stroke-width="5" stroke-linecap="round"/>
+      <path d="M206 178 L225 184 L221 202 L202 196Z" fill="#ffcf4a" stroke="#b88a10" stroke-width="1"/>
+      <circle cx="262" cy="40" r="8" fill="#a0a0ae"/>
+    </g></g>
+    <circle id="led" cx="270" cy="228" r="4.5"/>
   </svg>
   <div id="status"></div>
   <div class="card">
@@ -97,10 +132,12 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <input type="text" id="inTitle" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
     <label for="inArtist">Interpret</label>
     <input type="text" id="inArtist" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
-    <div class="row"><button id="play">Abspielen</button><button class="sec" id="pause">Pause</button></div>
-    <div class="row"><button class="sec" id="showp">Player anzeigen</button><button class="sec" id="skip">Überspringen</button></div>
-    <div class="row"><button id="reveal" disabled>Aufdecken</button></div>
+    <div class="row"><button id="play" data-ic="play"><span class="t">Abspielen</span></button><button class="sec" id="pause" data-ic="pause"><span class="t">Pause</span></button></div>
+    <div class="row"><button class="sec" id="showp" data-ic="video"><span class="t">Player anzeigen</span></button></div>
+    <div id="whoWrap" hidden><label for="who">Wer hat zuerst geraten?</label><select id="who"></select></div>
+    <div class="row"><button id="reveal" disabled data-ic="eye"><span class="t">Aufdecken</span></button></div>
     <div class="sub" style="margin-top:6px">Aufdecken geht, sobald der Song einmal gespielt hat.</div>
+    <div style="text-align:center;margin-top:4px"><button class="link" id="skip">Hängt? Anderen Song laden</button></div>
   </div>
   <div id="pslot" hidden></div>
   <div class="card" id="rev" hidden>
@@ -110,7 +147,8 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <label class="chk"><input type="checkbox" id="ckA"> <span id="ckAl"></span></label>
     <div class="sub">Haken sind vorbelegt (ähnlicher Abgleich), du kannst sie korrigieren.</div>
     <div class="big" id="ptsPrev"></div>
-    <div class="row"><button id="nextBtn">Weiter</button></div>
+    <div class="msg" id="whoMsg" hidden>Bitte oben wählen, wer zuerst geraten hat (oder „niemand“).</div>
+    <div class="row"><button id="nextBtn" data-ic="arrow"><span class="t">Weiter</span></button></div>
   </div>
 </section>
 
@@ -120,6 +158,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
   <div class="card">
     <div class="big" id="endScore"></div>
     <div class="sub" style="text-align:center" id="endSub"></div>
+    <ol class="h" id="endRank" hidden></ol>
     <ol class="h" id="endList"></ol>
     <div class="row"><button id="againBtn">Nochmal spielen</button></div>
     <div class="row"><button class="sec" id="menuBtn">Zum Menü</button></div>
@@ -153,7 +192,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
   <li><b>Weiter</b> bucht die Punkte und startet die nächste Runde (wieder per Tipp auf Abspielen).</li></ol>
   <h3>Punkte</h3>
   <p>Titel richtig: <b>2</b> Punkte, Interpret richtig: <b>1</b> Punkt. Der Abgleich ist tolerant: Groß/Klein, Akzente, Reihenfolge und kleine Tippfehler sind egal. Steht in beiden Feldern derselbe Text, zählt er nur einmal. Hinweise und Zeitbonus kommen in einer späteren Version.</p>
-  <h3>Player / Werbung</h3>
+  <h3>Freunde-Modus</h3><p>Im Modus „Freunde (ein Gerät)“ trägst du 2 bis 8 Namen ein. Pro Runde wählst du im Feld „Wer hat zuerst geraten?“ die Person (oder „niemand“), die Punkte gehen an sie. Am Ende gibt es Rangliste, Sieger oder Gleichstand.</p><h3>Player / Werbung</h3><p>„Hängt? Anderen Song laden“ ist nur der Notknopf, falls ein Song nicht startet.</p>
   <p><b>Player anzeigen</b> blendet das Video ein, damit du Werbung wegklicken kannst. Werbung automatisch zu erkennen geht nicht.</p>
   <p>Beste Nutzung mit Adblocker. Beobachtet: <b>Chrome</b> zeigt bei jedem Song Werbung, <b>Brave</b> blockt sie von selbst. Auch <b>Firefox mit uBlock Origin</b> sollte gehen (nicht geprüft). Ob der Blocker im <i>installierten</i> App-Fenster (PWA) greift, ist offen.</p>
   <h3>Playlists</h3>
@@ -178,7 +217,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 /* ---------- Speicher ---------- */
 let DB=loadDB();
 function loadDB(){let o={};try{o=JSON.parse(localStorage.getItem(K))||{}}catch(e){}
-  o.settings=Object.assign({len:10,start:'random',rounds:10,genres:[]},o.settings);
+  o.settings=Object.assign({len:10,start:'random',rounds:10,genres:[],mode:'solo',names:['','']},o.settings);
   o.pl=Object.assign({discardDefaults:false,override:{},off:{},custom:[]},o.pl);
   o.idCache=o.idCache||{};return o;}
 function save(){try{localStorage.setItem(K,JSON.stringify(DB))}catch(e){}}
@@ -247,6 +286,7 @@ function activeSources(){
 
 /* ---------- YouTube ---------- */
 const S={player:null,decks:{},bad:{},score:0,round:0,hist:[],cur:null,srcKey:null,seg:null,first:false,seeked:false,started:false,vd:null,revealed:false,endT:null,wd:null,retry:0,busy:false,pshown:false,pi:null,parsed:null,active:false};
+S.names=[];S.scores={};S.friends=false;S.errRun=0;
 function loadApi(){
   if(window.YT&&window.YT.Player)return Promise.resolve();
   return new Promise((res,rej)=>{window.onYouTubeIframeAPIReady=res;const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>rej(new Error('YouTube-API nicht ladbar (Netz?)'));document.head.appendChild(s);setTimeout(()=>rej(new Error('Zeitüberschreitung beim Laden der YouTube-API')),12000);});
@@ -287,44 +327,70 @@ async function pickSong(){
 /* ---------- Ansichten ---------- */
 function show(id){['home','game','end','plmgr'].forEach(x=>$(x).hidden=x!==id);window.scrollTo(0,0);if(id!=='game')showPlayer(false);if(id==='home')renderHome();if(id==='plmgr')renderPl();}
 function setStatus(t){$('status').textContent=t||'';}
+const SV=p=>'<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="'+p+'"/></svg>';
+const IC={play:SV('M8 5v14l11-7z'),pause:SV('M6 5h4v14H6zM14 5h4v14h-4z'),
+ replay:SV('M12 5V2L7 6.5 12 11V8c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z'),
+ eye:SV('M12 5C7 5 2.7 8.1 1 12.5 2.7 16.9 7 20 12 20s9.3-3.1 11-7.5C21.3 8.1 17 5 12 5zm0 12.5a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z'),
+ video:SV('M4 6h11a2 2 0 012 2v2.5l4-2.5v8l-4-2.5V16a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z'),
+ arrow:SV('M4 11h12.2l-5.6-5.6L12 4l8 8-8 8-1.4-1.4 5.6-5.6H4z')};
+function setT(id,t){const e=$(id).querySelector('.t');if(e)e.textContent=t;}
+function setPlayBtn(replay){$('play').innerHTML=IC[replay?'replay':'play']+'<span class="t">'+(replay?'Nochmal hören':'Abspielen')+'</span>';}
+function setTT(st){const t=$('tt');t.classList.toggle('loading',st==='loading');t.classList.toggle('playing',st==='playing');}
 function setBusy(on){S.busy=on;['play','pause','reveal','skip'].forEach(i=>$(i).disabled=on);if(!on)$('reveal').disabled=!S.vd||S.revealed;}
-function hud(){const r=DB.settings.rounds;$('hud').textContent='Runde '+(S.round+1)+(r?'/'+r:'')+' · '+S.score+' Punkte';}
+function hud(){const r=DB.settings.rounds;$('hud').textContent='Runde '+(S.round+1)+(r?'/'+r:'')+(S.friends?'':' · '+S.score+' Punkte');$('scores').textContent=S.friends?S.names.map(n=>n+' '+S.scores[n]).join(' · '):'';}
 function placePlayer(){
   const pw=$('pw');
   if(!S.pshown){pw.style.left='-400px';pw.style.top='0px';pw.style.width='220px';pw.style.height='220px';return;}
   const r=$('pslot').getBoundingClientRect();
   pw.style.left=(r.left+scrollX)+'px';pw.style.top=(r.top+scrollY)+'px';pw.style.width=r.width+'px';pw.style.height=r.height+'px';
 }
-function showPlayer(on){S.pshown=on;$('pslot').hidden=!on;$('showp').textContent=on?'Player verbergen':'Player anzeigen';placePlayer();clearInterval(S.pi);S.pi=on?setInterval(placePlayer,400):null;}
+function showPlayer(on){S.pshown=on;$('pslot').hidden=!on;setT('showp',on?'Player verbergen':'Player anzeigen');placePlayer();clearInterval(S.pi);S.pi=on?setInterval(placePlayer,400):null;}
 window.addEventListener('resize',placePlayer);
 
 function renderHome(){
   const st=DB.settings;$('sLen').value=String(st.len);$('sStart').value=st.start;$('sRounds').value=String(st.rounds);
   const gl=genreList();st.genres=(st.genres||[]).filter(id=>gl.some(g=>g.id===id));
   $('chips').innerHTML=gl.map(g=>`<button class="chip" data-g="${esc(g.id)}" aria-pressed="${st.genres.includes(g.id)}" ${g.ok?'':'disabled'}>${esc(g.name)}${g.ok?'':' (leer)'}</button>`).join('')||'<span class="sub">Keine Genres.</span>';
-  $('homeMsg').hidden=true;
+  $('homeMsg').hidden=true;renderMode();
 }
 $('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b||b.disabled)return;const id=b.dataset.g,a=DB.settings.genres;const i=a.indexOf(id);i>=0?a.splice(i,1):a.push(id);save();renderHome();});
 ['sLen','sStart','sRounds'].forEach(id=>$(id).addEventListener('change',()=>{DB.settings.len=+$('sLen').value;DB.settings.start=$('sStart').value;DB.settings.rounds=+$('sRounds').value;save();}));
 function homeError(m){show('home');$('homeMsg').textContent=m;$('homeMsg').hidden=false;}
+function renderMode(){const f=DB.settings.mode==='friends';$('mSolo').setAttribute('aria-pressed',String(!f));$('mFriends').setAttribute('aria-pressed',String(f));$('namesBox').hidden=!f;if(f)renderNames();}
+function renderNames(){const st=DB.settings;if(!Array.isArray(st.names))st.names=[];while(st.names.length<2)st.names.push('');
+  $('names').innerHTML=st.names.map((n,i)=>`<div class="row" style="margin-top:6px"><input type="text" data-i="${i}" value="${esc(n)}" placeholder="Name ${i+1}" maxlength="20" autocomplete="off"><button class="sec small" data-rm="${i}" style="flex:0 0 48px" aria-label="Entfernen" ${st.names.length<=2?'disabled':''}>✕</button></div>`).join('');
+  $('addPerson').disabled=st.names.length>=8;}
+$('mSolo').onclick=()=>{DB.settings.mode='solo';save();renderMode();};
+$('mFriends').onclick=()=>{DB.settings.mode='friends';save();renderMode();};
+$('names').addEventListener('input',e=>{const i=e.target.dataset.i;if(i!=null){DB.settings.names[+i]=e.target.value;save();}});
+$('names').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;DB.settings.names.splice(+b.dataset.rm,1);save();renderNames();});
+$('addPerson').onclick=()=>{if(DB.settings.names.length<8){DB.settings.names.push('');save();renderNames();}};
 
 /* ---------- Spielablauf ---------- */
 function cfg(){return {len:+DB.settings.len,rnd:DB.settings.start==='random'};}
 function stopTimers(){clearTimeout(S.endT);S.endT=null;clearTimeout(S.wd);S.wd=null;}
 function resetRoundUI(){
   stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}
-  $('inTitle').value='';$('inArtist').value='';$('rev').hidden=true;$('disc').classList.remove('spin');
+  $('inTitle').value='';$('inArtist').value='';$('rev').hidden=true;setTT('idle');$('who').value='';$('whoMsg').hidden=true;
   $('label').setAttribute('fill','hsl('+Math.floor(Math.random()*360)+' 75% 55%)');
   S.cur=null;S.seg=null;S.started=false;S.vd=null;S.revealed=false;S.parsed=null;S.first=false;S.seeked=false;
-  $('play').textContent='Abspielen';showPlayer(false);hud();
+  setPlayBtn(false);showPlayer(false);hud();
 }
-async function newSong(note){
+async function newSong(note,auto){
   setBusy(true);resetRoundUI();setStatus('Song wird ausgewählt …');
-  try{await ensurePlayer();const p=await pickSong();S.cur=p.vid;S.srcKey=p.key;setBusy(false);setStatus((note?note+' ':'')+'Tippe auf „Abspielen“.');}
+  try{await ensurePlayer();const p=await pickSong();S.cur=p.vid;S.srcKey=p.key;setBusy(false);if(auto){setStatus(note||'');play();}else setStatus((note?note+' ':'')+'Tippe auf „Abspielen“.');}
   catch(e){S.active=false;homeError(e.message);}
 }
 async function startGame(){
-  S.score=0;S.round=0;S.hist=[];S.bad={};S.active=true;
+  S.score=0;S.round=0;S.hist=[];S.bad={};S.active=true;S.errRun=0;
+  S.friends=DB.settings.mode==='friends';
+  if(S.friends){
+    const names=DB.settings.names.map(n=>n.trim()).filter(Boolean);
+    if(names.length<2||new Set(names.map(n=>n.toLowerCase())).size!==names.length){homeError('Freunde-Modus: mindestens 2 verschiedene Namen eintragen.');return;}
+    S.names=names;S.scores={};names.forEach(n=>S.scores[n]=0);
+    $('who').innerHTML='<option value="">– bitte wählen –</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')+'<option value="__none">niemand</option>';
+  }
+  $('whoWrap').hidden=!S.friends;$('scores').hidden=!S.friends;
   if(!activeSources().length){homeError('Keine aktive Playlist. Trag unter „Playlists verwalten“ eine URL ein.');return;}
   show('game');await newSong();
 }
@@ -333,15 +399,15 @@ function play(){
   if(S.started&&S.seg!=null){replay();return;}
   const c=cfg();S.first=true;S.seeked=false;stopTimers();
   try{c.rnd?S.player.mute():S.player.unMute();}catch(e){}
-  S.player.loadVideoById(S.cur);S.started=true;$('play').textContent='Nochmal hören';
-  setStatus('lädt …');armWd();
+  S.player.loadVideoById(S.cur);S.started=true;setPlayBtn(true);
+  setStatus('lädt …');setTT('loading');armWd();
 }
 function replay(){stopTimers();try{S.player.seekTo(S.seg,true);S.player.unMute();S.player.playVideo();}catch(e){}startSegment();}
 function armWd(){clearTimeout(S.wd);S.retry=0;S.wd=setTimeout(wdFire,8000);}
 function wdFire(){
   if(!S.first)return;
   if(S.retry<1){S.retry++;setStatus('lädt … (2. Versuch)');try{S.player.loadVideoById(S.cur);}catch(e){}S.wd=setTimeout(wdFire,8000);}
-  else{setStatus('Hängt – bitte nochmal „Abspielen“ tippen.');S.started=false;$('play').textContent='Abspielen';}
+  else{setStatus('Hängt – bitte nochmal „Abspielen“ tippen.');S.started=false;setPlayBtn(false);setTT('idle');}
 }
 function updateInfo(){try{const d=S.player.getVideoData();if(d&&d.title)S.vd=d;}catch(e){}}
 function startSegment(){
@@ -352,20 +418,23 @@ function startSegment(){
 function onState(e){
   const st=e.data,c=cfg();
   if(st===1){
-    $('disc').classList.add('spin');
+    setTT('playing');
     if(S.first){
-      S.first=false;clearTimeout(S.wd);
+      S.first=false;clearTimeout(S.wd);S.errRun=0;
       let d=0;try{d=S.player.getDuration();}catch(x){}
       if(c.rnd&&d>0){const t=Math.floor(Math.random()*Math.max(0,d-(c.len||0)-2));S.seg=t;S.seeked=true;S.player.seekTo(t,true);return;}
       S.seg=0;startSegment();return;
     }
     if(S.seeked){S.seeked=false;try{S.player.unMute();}catch(x){}startSegment();return;}
-  }else if(st===2||st===0){$('disc').classList.remove('spin');}
+  }else if(st===2||st===0){setTT('idle');}
 }
 function onError(e){
-  const code=e.data;stopTimers();$('disc').classList.remove('spin');
-  if(ERRCODES.includes(code)){S.bad_vid=(S.bad_vid||0)+1;setTimeout(()=>newSong('Video nicht verfügbar (Fehler '+code+'), anderer Song gewählt.'),600);}
-  else setStatus('YouTube-Fehler '+code);
+  const code=e.data;stopTimers();setTT('idle');
+  if(ERRCODES.includes(code)){
+    S.errRun++;
+    if(S.errRun>4){S.errRun=0;setStatus('Mehrere Videos hintereinander nicht abspielbar. Playlist oder Netz prüfen, dann „Anderen Song laden“.');return;}
+    setTimeout(()=>newSong('Video nicht verfügbar (Fehler '+code+'), nächster Song …',true),500);
+  }else setStatus('YouTube-Fehler '+code);
 }
 function reveal(){
   updateInfo();if(!S.vd||!S.vd.title){setStatus('Erst einmal abspielen.');return;}
@@ -376,30 +445,43 @@ function reveal(){
   $('ckTl').textContent='Titel richtig (+'+PTS.title+')';$('ckAl').textContent='Interpret richtig (+'+PTS.artist+')';
   const j=judge($('inTitle').value,$('inArtist').value,p);
   $('ckT').checked=j.title;$('ckA').checked=j.artist;ptsPrev();
-  $('rev').hidden=false;const last=DB.settings.rounds&&S.round+1>=DB.settings.rounds;$('nextBtn').textContent=last?'Ergebnis anzeigen':'Weiter';
+  $('rev').hidden=false;const last=DB.settings.rounds&&S.round+1>=DB.settings.rounds;setT('nextBtn',last?'Ergebnis anzeigen':'Weiter');
   showPlayer(true);setStatus('');
   setTimeout(()=>$('rev').scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 }
 function ptsPrev(){const n=($('ckT').checked?PTS.title:0)+($('ckA').checked?PTS.artist:0);$('ptsPrev').textContent='+'+n+' Punkte';return n;}
 function commit(){
-  const n=ptsPrev();S.score+=n;S.hist.push({yt:S.vd.title,by:S.vd.author,pts:n});S.round++;
+  let who='';
+  if(S.friends){who=$('who').value;if(!who){$('whoMsg').hidden=false;$('who').scrollIntoView({block:'center'});return;}}
+  const n=ptsPrev();let got=n;
+  if(S.friends){if(who==='__none')got=0;else S.scores[who]+=n;}else S.score+=n;
+  S.hist.push({yt:S.vd.title,by:S.vd.author,pts:got,who:S.friends?(who==='__none'?'niemand':who):''});S.round++;
   if(DB.settings.rounds&&S.round>=DB.settings.rounds)endGame();else newSong();
 }
 function endGame(){
   stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}S.active=false;
-  const max=S.hist.length*(PTS.title+PTS.artist);
-  $('endScore').textContent=S.score+' Punkte';$('endSub').textContent=S.hist.length?('aus '+S.hist.length+' Runden, maximal '+max+' möglich'):'keine Runde gewertet';
-  $('endList').innerHTML=S.hist.map(h=>`<li>${esc(h.yt)} <span class="sub">(${esc(h.by||'')})</span> – <b>${h.pts}</b></li>`).join('');
+  if(S.friends){
+    const arr=S.names.map(n=>[n,S.scores[n]]).sort((a,b)=>b[1]-a[1]);const top=arr[0][1],win=arr.filter(x=>x[1]===top).map(x=>x[0]);
+    $('endScore').textContent=!S.hist.length?'–':(win.length>1?'Gleichstand: '+win.join(' & '):'🏆 '+win[0]);
+    $('endSub').textContent=S.hist.length?('mit '+top+' Punkten · '+S.hist.length+' Runden'):'keine Runde gewertet';
+    $('endRank').innerHTML=arr.map(x=>`<li><b>${esc(x[0])}</b> – ${x[1]} Punkte</li>`).join('');$('endRank').hidden=false;
+  }else{
+    const max=S.hist.length*(PTS.title+PTS.artist);
+    $('endScore').textContent=S.score+' Punkte';$('endSub').textContent=S.hist.length?('aus '+S.hist.length+' Runden, maximal '+max+' möglich'):'keine Runde gewertet';
+    $('endRank').hidden=true;
+  }
+  $('endList').innerHTML=S.hist.map(h=>`<li>${esc(h.yt)} <span class="sub">(${esc(h.by||'')})</span> – ${h.who?esc(h.who)+': ':''}<b>${h.pts}</b></li>`).join('');
   show('end');
 }
 $('startBtn').onclick=startGame;
 $('play').onclick=play;
 $('pause').onclick=()=>{try{S.player.pauseVideo();}catch(e){}stopTimers();setStatus('Pause');};
 $('showp').onclick=()=>showPlayer(!S.pshown);
-$('skip').onclick=()=>{if(!S.busy)newSong('Übersprungen.');};
+$('skip').onclick=()=>{if(!S.busy)newSong('Anderer Song geladen.');};
 $('reveal').onclick=reveal;
 $('ckT').onchange=ptsPrev;$('ckA').onchange=ptsPrev;
 $('nextBtn').onclick=commit;
+$('who').onchange=()=>{$('whoMsg').hidden=true;};
 $('endBtn').onclick=()=>{if(S.hist.length)endGame();else{S.active=false;stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}show('home');}};
 $('againBtn').onclick=startGame;
 $('menuBtn').onclick=()=>show('home');
@@ -453,7 +535,7 @@ $('helpClose').onclick=()=>$('helpBg').hidden=true;
 $('helpBg').addEventListener('click',e=>{if(e.target.id==='helpBg')$('helpBg').hidden=true;});
 
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
-renderHome();
+document.querySelectorAll('[data-ic]').forEach(b=>b.insertAdjacentHTML('afterbegin',IC[b.dataset.ic]));renderHome();
 window.__sg={S:S,DB:function(){return DB},parseYT,judge,cleanTitle,norm,scoreTitle,scoreArtist};
 })();
 </script>
