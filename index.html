@@ -225,7 +225,7 @@ $('load').onclick=loadPlaylist;
 $('play').onclick=play;
 $('pause').onclick=()=>{try{S.player.pauseVideo();}catch(e){}};
 $('again').onclick=()=>{if(S.seg==null)return;const c=cfg();S.heard=0;try{S.player.seekTo(S.seg,true);S.player.unMute();S.player.playVideo();}catch(e){}stopTimers();startSegment();log('Nochmal hören ab '+S.seg+' s');};
-$('next').onclick=()=>nextSong(false);
+$('next').onclick=()=>nextSong(true);
 $('reveal').onclick=reveal;
 function togglePlayer(on){$('pw').classList.toggle('show',on);$('pclose').classList.toggle('show',on);$('showp').textContent=on?'Player verbergen':'Player anzeigen';}
 $('showp').onclick=()=>togglePlayer(!$('pw').classList.contains('show'));
