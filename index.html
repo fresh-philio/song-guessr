@@ -4,12 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#14121f">
+<script>try{var _s=(JSON.parse(localStorage.getItem('songguessr-v1'))||{}).settings||{};document.documentElement.dataset.theme=_s.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.lang=_s.lang||((navigator.language||'de').toLowerCase().indexOf('de')===0?'de':'en')}catch(e){document.documentElement.dataset.theme='light'}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <title>Song Guessr</title>
 <style>
 :root{--page:linear-gradient(165deg,#ffe0cc 0%,#ecdcff 45%,#cde2ff 100%);--bg:#f4eefc;--surface:rgba(255,255,255,.86);--text:#1d1a2b;--muted:#6b6780;--accent:#7a3df0;--accent2:#ff4fa3;--accent-text:#fff;--border:#d9cdee;--ok:#13804a;--bad:#c4262e;--chip:#efe6ff}
-@media (prefers-color-scheme:dark){:root{--page:radial-gradient(800px 480px at 85% -5%,rgba(150,60,200,.38),transparent 60%),radial-gradient(700px 520px at 0% 100%,rgba(50,90,200,.30),transparent 60%),#0f0c19;--bg:#171326;--surface:rgba(36,30,60,.88);--text:#f0edfa;--muted:#a9a2c4;--accent:#9b6bff;--accent2:#ff5fae;--accent-text:#fff;--border:#3c3558;--ok:#4cd08a;--bad:#ff7a82;--chip:#2d2748}}
+:root{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark;--page:radial-gradient(800px 480px at 85% -5%,rgba(150,60,200,.38),transparent 60%),radial-gradient(700px 520px at 0% 100%,rgba(50,90,200,.30),transparent 60%),#0f0c19;--bg:#171326;--surface:rgba(36,30,60,.88);--text:#f0edfa;--muted:#a9a2c4;--accent:#9b6bff;--accent2:#ff5fae;--accent-text:#fff;--border:#3c3558;--ok:#4cd08a;--bad:#ff7a82;--chip:#2d2748}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--page);background-attachment:fixed;min-height:100vh;color:var(--text);font:16px/1.4 system-ui,sans-serif;padding:12px max(14px,env(safe-area-inset-right)) 48px max(14px,env(safe-area-inset-left));max-width:520px;margin-inline:auto;position:relative}
@@ -36,6 +38,13 @@ button:disabled{opacity:.4}
 .chip:disabled{opacity:.45}
 .chk{display:flex;align-items:center;gap:10px;color:var(--text);font-size:1rem;margin:10px 0;min-height:44px}
 .chk input{width:26px;height:26px;flex:none}
+#bar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0 0 6px}
+.flag{width:auto;min-height:40px;padding:6px 10px;background:var(--surface);color:var(--text);border:2px solid var(--border)}
+.flag[aria-pressed=true]{border-color:var(--accent)}
+.flag svg{display:block;border-radius:3px}
+#themeBtn svg{border-radius:0}
+:root[data-theme=dark] .moon,:root[data-theme=light] .sun{display:none}
+html[lang=de] .en,html[lang=en] .de{display:none}
 .msg{color:var(--bad);margin-top:8px;font-size:.92rem}
 #tt{cursor:pointer;display:block;width:min(92vw,380px);margin:4px auto 8px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.35))}
 #rec{transform-box:view-box;transform-origin:140px 128px}
@@ -68,6 +77,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
 </style>
 </head>
 <body>
+<div id="bar"><button class="flag" id="langDe" aria-label="Deutsch" aria-pressed="false"><svg viewBox="0 0 24 16" width="24" height="16" aria-hidden="true"><rect width="24" height="5.4" fill="#111"/><rect y="5.3" width="24" height="5.4" fill="#d00"/><rect y="10.6" width="24" height="5.4" fill="#fc0"/></svg></button><button class="flag" id="langEn" aria-label="English" aria-pressed="false"><svg viewBox="0 0 24 16" width="24" height="16" aria-hidden="true"><rect width="24" height="16" fill="#012169"/><path d="M0 0L24 16M24 0L0 16" stroke="#fff" stroke-width="3.2"/><path d="M0 0L24 16M24 0L0 16" stroke="#c8102e" stroke-width="1.2"/><path d="M12 0V16M0 8H24" stroke="#fff" stroke-width="5.2"/><path d="M12 0V16M0 8H24" stroke="#c8102e" stroke-width="3"/></svg></button><button class="flag" id="themeBtn" aria-label="Darstellung wechseln"><svg class="ic moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><svg class="ic sun" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button></div>
 
 <!-- ============ HOME ============ -->
 <section id="home">
@@ -100,7 +110,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <div class="row"><button class="sec" id="plBtn">Playlists verwalten</button></div>
   </div>
   <div class="card" id="histCard" hidden><h2>Verlauf</h2><ol class="h" id="histList"></ol><div class="row"><button class="sec small" id="histClear">Verlauf löschen</button></div></div>
-  <div class="sub ver">Song Guessr v1.4 (Etappe 3) · <a href="test.html">Testseite</a></div>
+  <div class="sub ver">Song Guessr v2.1 · <a href="test.html">Testseite</a></div>
 </section>
 
 <!-- ============ GAME ============ -->
@@ -148,7 +158,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
   <div id="pslot" hidden></div>
   <div class="card" id="rev" hidden>
     <h2>Aufgedeckt</h2>
-    <div class="kv"><b>YouTube-Titel</b><span id="rTitle"></span><b>Kanal</b><span id="rChan"></span><b>Erkannt</b><span id="rParsed"></span></div>
+    <div class="kv"><b>YouTube-Titel</b><span id="rTitle" data-notr></span><b>Kanal</b><span id="rChan" data-notr></span><b>Erkannt</b><span id="rParsed"></span></div>
     <label class="chk"><input type="checkbox" id="ckT"> <span id="ckTl"></span></label>
     <label class="chk"><input type="checkbox" id="ckA"> <span id="ckAl"></span></label>
     <div class="sub">Haken sind vorbelegt (ähnlicher Abgleich), du kannst sie korrigieren.</div>
@@ -191,7 +201,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
 <!-- ============ HILFE ============ -->
 <div id="helpBg" hidden><div id="helpBox">
   <div class="top"><h2 style="margin:0">So geht's</h2><button class="sec small" id="helpClose">Schließen</button></div>
-  <h3>Spielablauf</h3>
+  <div class="de" data-notr><h3>Spielablauf</h3>
   <ol><li>Genres wählen (oder nichts = gemischt), Länge, Start und Rundenzahl einstellen, Spiel starten.</li>
   <li>Auf <b>Abspielen</b> tippen: der Song läuft versteckt, die Platte dreht sich (Tipp auf den Plattenspieler = Pause). <b>Nochmal hören</b> wiederholt denselben Ausschnitt.</li>
   <li>Titel und Interpret eintippen, dann <b>Aufdecken</b>. Du siehst YouTube-Titel und Kanal, die Haken sind vorbelegt und von dir änderbar.</li>
@@ -202,7 +212,12 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
   <p><b>Player anzeigen</b> blendet das Video ein, damit du Werbung wegklicken kannst. Werbung automatisch zu erkennen geht nicht.</p>
   <p>Beste Nutzung mit Adblocker. Beobachtet: <b>Chrome</b> zeigt bei jedem Song Werbung, <b>Brave</b> blockt sie von selbst. Auch <b>Firefox mit uBlock Origin</b> sollte gehen (nicht geprüft). Ob der Blocker im <i>installierten</i> App-Fenster (PWA) greift, ist offen.</p>
   <h3>Playlists</h3>
-  <p>Unter „Playlists verwalten“ kannst du eigene YouTube-Playlist-URLs eintragen, einzeln an/aus schalten und prüfen. Playlists sollten öffentlich oder nicht gelistet sein und Einbettung erlauben.</p>
+  <p>Unter „Playlists verwalten“ kannst du eigene YouTube-Playlist-URLs eintragen, einzeln an/aus schalten und prüfen. Playlists sollten öffentlich oder nicht gelistet sein und Einbettung erlauben.</p></div><div class="en"><h3>How a round works</h3><ol><li>Pick genres (none = mixed), clip length, start mode and number of rounds, then start.</li><li>Tap <b>Play</b>: the song plays hidden and the record spins (tap the turntable = pause). <b>Listen again</b> repeats the same clip.</li><li>Type title and artist, then <b>Reveal</b>. You see the YouTube title and channel; the checkboxes are pre-filled and you can change them.</li><li><b>Next</b> books the points and starts the next round (tap Play again).</li></ol>
+  <h3>Points</h3><p>Correct title: <b>2</b> points, correct artist: <b>1</b> point. Matching is tolerant: case, accents, word order and small typos don't matter. The same text in both fields counts once. <b>Time bonus</b> (optional): 3 s ×3, 10 s ×2, 20 s ×1.5; for the full song it shrinks with listening time (up to 3 s ×3, up to 10 s ×2, up to 20 s ×1.5, then ×1). <b>Hints</b> (genre, length, start) cost points (adjustable); a round never scores below 0. “Show player” is free (needed for ads).</p>
+  <h3>Friends mode</h3><p>Enter 2 to 12 names. Each round pick who guessed first (or “nobody”); that person gets the points. If you pick nobody but there are points, the red Next button warns once; a second tap counts as “nobody”. The end screen shows ranking, winner or tie.</p>
+  <h3>Player / ads</h3><p><b>Show player</b> reveals the video so you can skip ads. Ads cannot be detected automatically. “Stuck? Load another song” is just the emergency button.</p>
+  <p>Best used with an ad blocker. Observed: <b>Chrome</b> shows ads on every song, <b>Brave</b> blocks them by itself. <b>Firefox with uBlock Origin</b> should work too (untested). Whether a blocker works in the installed app window (PWA) is unknown.</p>
+  <h3>Playlists</h3><p>Under “Manage playlists” you can add your own YouTube playlist URLs, switch them on/off and check them. Playlists should be public or unlisted and allow embedding.</p></div>
 </div></div>
 
 <div id="pw"><div id="ytp"></div></div>
@@ -223,7 +238,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 /* ---------- Speicher ---------- */
 let DB=loadDB();
 function loadDB(){let o={};try{o=JSON.parse(localStorage.getItem(K))||{}}catch(e){}
-  o.settings=Object.assign({len:10,start:'random',rounds:10,genres:[],mode:'solo',names:['',''],timeBonus:true,hintCost:1},o.settings);
+  o.settings=Object.assign({len:10,start:'random',rounds:10,genres:[],mode:'solo',names:['',''],timeBonus:true,hintCost:1,lang:((navigator.language||'de').toLowerCase().indexOf('de')===0?'de':'en')},o.settings);
   o.pl=Object.assign({discardDefaults:false,override:{},off:{},custom:[]},o.pl);
   o.idCache=o.idCache||{};o.history=Array.isArray(o.history)?o.history:[];return o;}
 function save(){try{localStorage.setItem(K,JSON.stringify(DB))}catch(e){}}
@@ -570,8 +585,111 @@ function renderExtras(){const st=DB.settings;$('sBonus').checked=st.timeBonus!==
 $('sBonus').onchange=()=>{DB.settings.timeBonus=$('sBonus').checked;save();};
 $('sHint').onchange=()=>{DB.settings.hintCost=+$('sHint').value;save();};
 $('histClear').onclick=()=>{DB.history=[];save();renderHome();};
+/* ---------- Sprache (DE/EN) und Theme ---------- */
+const EXACT={
+'Modus':'Mode','Freunde (ein Gerät)':'Friends (one device)','+ Person':'+ Player','Entfernen':'Remove',
+'Namen eintragen (2 bis 12). Pro Runde wählst du, wer zuerst richtig geraten hat.':'Enter names (2 to 12). Each round you pick who guessed first.',
+'Nichts gewählt = gemischt aus allen aktiven Playlists.':'Nothing selected = mixed from all active playlists.',
+'Keine Genres.':'No genres.','Länge':'Length','ganzer Song':'full song','vom Anfang':'from the beginning','zufälliger Ausschnitt':'random clip','Runden':'Rounds','endlos':'endless',
+'Zeitbonus (kürzer = mehr Punkte)':'Time bonus (shorter = more points)','Hinweis kostet':'Hint costs',
+'Spiel starten':'Start game','Playlists verwalten':'Manage playlists','Verlauf':'History','Verlauf löschen':'Clear history','Testseite':'Test page',
+'Beenden':'End','Titel':'Title','Interpret':'Artist','Wer hat zuerst geraten?':'Who guessed first?','– bitte wählen –':'– please choose –','niemand':'nobody',
+'Abspielen':'Play','Nochmal hören':'Listen again','Player anzeigen':'Show player','Player verbergen':'Hide player','Aufdecken':'Reveal','Hinweise':'Hints',
+'Aufdecken geht, sobald der Song einmal gespielt hat.':'Reveal works once the song has played.','Hängt? Anderen Song laden':'Stuck? Load another song',
+'Aufgedeckt':'Revealed','YouTube-Titel':'YouTube title','Kanal':'Channel','Erkannt':'Detected',
+'Haken sind vorbelegt (ähnlicher Abgleich), du kannst sie korrigieren.':'Checkboxes are pre-filled (fuzzy match); you can correct them.',
+'Wenn nichts gewählt wird, wird für niemand ein Punkt vergeben. Zum Bestätigen nochmal tippen.':'If nobody is selected, no points are awarded. Tap again to confirm.',
+'Weiter':'Next','Ergebnis anzeigen':'Show result','Ergebnis':'Result','Nochmal spielen':'Play again','Zum Menü':'Back to menu',
+'Zurück':'Back','Standard-Playlists verwerfen (nur eigene nutzen)':'Discard default playlists (use only my own)',
+'Bei einer Standard-Zeile kannst du eine eigene URL eintragen, die sie ersetzt. Leer lassen = Standard.':'On a default row you can enter your own URL to replace it. Leave empty = default.',
+'Eigene Playlist hinzufügen':'Add custom playlist','Hinzufügen':'Add','Prüfen':'Check','Löschen':'Delete','Eigene':'Custom','Standard':'Default','Eigene Playlist':'Custom playlist','Ohne Namen':'Unnamed',
+'z. B. Meine 90er':'e.g. My 90s','eigene URL (Standard ist leer)':'custom URL (default is empty)',
+'Keine Playlists. Füge unten eine hinzu.':'No playlists. Add one below.','keine URL':'no URL','prüfe …':'checking …','noch nicht geprüft':'not checked yet','leer':'empty',
+'Das ist keine gültige Playlist-URL (es fehlt „list=…“).':'That is not a valid playlist URL (“list=…” is missing).','Keine gültige Playlist-URL.':'Not a valid playlist URL.',
+'Song wird ausgewählt …':'Selecting a song …','lädt …':'loading …','lädt … (2. Versuch)':'loading … (2nd try)','spielt …':'playing …','Ausschnitt vorbei – rate!':'Clip over – guess!','Erst einmal abspielen.':'Play it once first.',
+'Hängt – bitte nochmal „Abspielen“ tippen.':'Stuck – please tap “Play” again.','Anderer Song geladen.':'Another song loaded.',
+'Mehrere Videos hintereinander nicht abspielbar. Playlist oder Netz prüfen, dann „Anderen Song laden“.':'Several videos in a row failed. Check the playlist or network, then “Load another song”.',
+'Keine aktive Playlist. Trag unter „Playlists verwalten“ eine URL ein.':'No active playlist. Add a URL under “Manage playlists”.',
+'Freunde-Modus: mindestens 2 verschiedene Namen eintragen.':'Friends mode: enter at least 2 different names.',
+'Playlist leer, privat oder ungültig':'Playlist empty, private or invalid','YouTube-API nicht ladbar (Netz?)':'YouTube API not loadable (network?)','Zeitüberschreitung beim Laden der YouTube-API':'Timeout loading the YouTube API','Zeitüberschreitung':'Timeout',
+'keine Runde gewertet':'no round scored','Plattenspieler mit Schallplatte':'Turntable with record','Hilfe':'Help','Darstellung wechseln':'Switch theme','Schließen':'Close',"So geht's":'How to play'
+};
+const RULES=[
+ [/aus (\d+) Runden, maximal (\d+) möglich/g,'from $1 rounds, max. $2 possible'],
+ [/mit (\d+) Punkten · (\d+) Runden/g,'with $1 points · $2 rounds'],
+ [/(\d+) Videos \(geprüft\)/g,'$1 videos (checked)'],
+ [/(\d+) Videos/g,'$1 videos'],
+ [/^Titel: (\d+) Buchstaben in (\d+) Wörtern$/,'Title: $1 letters in $2 words'],
+ [/^Anfang: /,'Start: '],
+ [/^Länge(?= \(|$)/,'Length'],
+ [/^Anfang(?= \(|$)/,'Start'],
+ [/^Titel richtig/,'Title correct'],
+ [/^Interpret richtig/,'Artist correct'],
+ [/Video nicht verfügbar \(Fehler (\d+)\), nächster Song …/g,'Video unavailable (error $1), next song …'],
+ [/Tippe auf „Abspielen“\./g,'Tap “Play”.'],
+ [/Keine Playlist ladbar/g,'No playlist could be loaded'],
+ [/YouTube-Fehler (\d+)/g,'YouTube error $1'],
+ [/\(Interpret ≈ Kanal: /g,'(artist ≈ channel: '],
+ [/Zeitbonus/g,'Time bonus'],
+ [/Hinweise −(?=\d)/g,'Hints −'],
+ [/Gleichstand: /g,'Tie: '],
+ [/(\d+) Punkte?\b/g,(m,n)=>n+(n==='1'?' point':' points')],
+ [/(\d+) Runden/g,'$1 rounds'],
+ [/\bRunde (\d+)/g,'Round $1'],
+ [/ · Freunde · /g,' · Friends · '],
+ [/ · gemischt\b/g,' · mixed'],
+ [/ \(leer\)$/,' (empty)'],
+ [/^Eigene – /,'Custom – '],
+ [/ – Standard(?=$|:)/g,' – Default'],
+ [/ – Eigene URL(?=$|:)/g,' – Custom URL'],
+ [/Kinderserien-Intros/g,"Kids' TV intros"],[/Film-Titelmelodien/g,'Movie themes'],[/Deutsch \(Pop\/Schlager\)/g,'German (pop/Schlager)'],[/Videospiel-Musik/g,'Video game music'],
+ [/\b2000er\b/g,'2000s'],[/\b90er\b/g,'90s'],[/\b80er\b/g,'80s'],
+ [/\bniemand\b/g,'nobody'],
+ [/×(\d),(\d)/g,'×$1.$2']
+];
+function toEn(s){const m=s.match(/^(\s*)([\s\S]*?)(\s*)$/),core=m[2];if(!core)return s;
+  if(Object.prototype.hasOwnProperty.call(EXACT,core))return m[1]+EXACT[core]+m[3];
+  let o=s;for(const [r,x] of RULES)o=o.replace(r,x);return o;}
+const REC=new WeakMap(),AREC=new WeakMap(),ATTRS=['placeholder','aria-label','title'];
+const notr=n=>{const e=n.nodeType===1?n:n.parentElement;return !!(e&&e.closest&&e.closest('[data-notr]'));};
+function trText(n){
+  if(DB.settings.lang!=='en'||notr(n))return;
+  const v=n.nodeValue;if(!v||!v.trim())return;
+  const r=REC.get(n);if(r&&v===r.t)return;
+  const t=toEn(v);if(t!==v){REC.set(n,{o:v,t:t});n.nodeValue=t;}else if(r)REC.delete(n);
+}
+function trAttrs(el){
+  if(notr(el))return;
+  ATTRS.forEach(a=>{if(!el.hasAttribute(a))return;const cur=el.getAttribute(a);let m=AREC.get(el);
+    if(DB.settings.lang==='en'){if(m&&m[a]&&cur===m[a].t)return;const t=toEn(cur);if(t!==cur){if(!m)AREC.set(el,m={});m[a]={o:cur,t:t};el.setAttribute(a,t);}}
+    else if(m&&m[a]&&cur===m[a].t){el.setAttribute(a,m[a].o);delete m[a];}});
+}
+function walkTr(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))trText(n);
+  if(root.nodeType===1){trAttrs(root);root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(trAttrs);}
+}
+function restoreAll(){
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
+  while((n=w.nextNode())){const r=REC.get(n);if(r&&n.nodeValue===r.t)n.nodeValue=r.o;REC.delete(n);}
+  document.body.querySelectorAll('[placeholder],[aria-label],[title]').forEach(trAttrs);
+}
+let MO=null;
+function startMO(){if(MO)return;MO=new MutationObserver(ms=>{if(DB.settings.lang!=='en')return;
+  ms.forEach(m=>{if(m.type==='characterData')trText(m.target);else if(m.type==='attributes')trAttrs(m.target);
+    else m.addedNodes.forEach(n=>{if(n.nodeType===3)trText(n);else if(n.nodeType===1)walkTr(n);});});});
+  MO.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:ATTRS});}
+function setLang(l){
+  DB.settings.lang=l;save();document.documentElement.lang=l;
+  $('langDe').setAttribute('aria-pressed',String(l==='de'));$('langEn').setAttribute('aria-pressed',String(l==='en'));
+  if(l==='en')walkTr(document.body);else restoreAll();
+}
+function setTheme(t){DB.settings.theme=t;save();applyTheme();}
+function applyTheme(){const t=document.documentElement.dataset.theme;const m=document.querySelector('meta[name=theme-color]');if(m)m.content=t==='dark'?'#14121f':'#f4eefc';}
+$('themeBtn').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;setTheme(t);};
+$('langDe').onclick=()=>setLang('de');$('langEn').onclick=()=>setLang('en');
+function initI18n(){startMO();applyTheme();setLang(DB.settings.lang);}
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
-document.querySelectorAll('[data-ic]').forEach(b=>b.insertAdjacentHTML('afterbegin',IC[b.dataset.ic]));renderHome();
+document.querySelectorAll('[data-ic]').forEach(b=>b.insertAdjacentHTML('afterbegin',IC[b.dataset.ic]));renderHome();initI18n();
 window.__sg={S:S,DB:function(){return DB},parseYT,judge,cleanTitle,norm,scoreTitle,scoreArtist};
 })();
 </script>
