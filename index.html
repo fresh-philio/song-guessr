@@ -93,11 +93,14 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     </div>
     <label for="sRounds">Runden</label>
     <select id="sRounds"><option value="5">5</option><option value="10">10</option><option value="20">20</option><option value="0">endlos</option></select>
+    <label class="chk"><input type="checkbox" id="sBonus"> <span>Zeitbonus (kürzer = mehr Punkte)</span></label>
+    <label for="sHint">Hinweis kostet</label><select id="sHint"><option value="0">0 Punkte</option><option value="1">1 Punkt</option><option value="2">2 Punkte</option><option value="3">3 Punkte</option></select>
     <div class="row"><button id="startBtn" data-ic="play"><span class="t">Spiel starten</span></button></div>
     <div class="msg" id="homeMsg" hidden></div>
     <div class="row"><button class="sec" id="plBtn">Playlists verwalten</button></div>
   </div>
-  <div class="sub ver">Song Guessr v1.3 (Etappe 2) · <a href="test.html">Testseite</a></div>
+  <div class="card" id="histCard" hidden><h2>Verlauf</h2><ol class="h" id="histList"></ol><div class="row"><button class="sec small" id="histClear">Verlauf löschen</button></div></div>
+  <div class="sub ver">Song Guessr v1.4 (Etappe 3) · <a href="test.html">Testseite</a></div>
 </section>
 
 <!-- ============ GAME ============ -->
@@ -137,6 +140,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <div id="whoWrap" hidden><label for="who">Wer hat zuerst geraten?</label><select id="who"></select></div>
     <div class="row"><button id="play" data-ic="play"><span class="t">Abspielen</span></button><button class="sec" id="pause" data-ic="pause"><span class="t">Pause</span></button></div>
     <div class="row"><button class="sec" id="showp" data-ic="video"><span class="t">Player anzeigen</span></button></div>
+    <div id="hintsBox"><div class="sub" style="margin-top:10px">Hinweise</div><div class="chips"><button class="chip" id="hG" disabled>Genre</button><button class="chip" id="hL" disabled>Länge</button><button class="chip" id="hS" disabled>Anfang</button></div><div id="hintOut" style="margin-top:6px"></div></div>
     <div class="row"><button id="reveal" disabled data-ic="eye"><span class="t">Aufdecken</span></button></div>
     <div class="sub" style="margin-top:6px">Aufdecken geht, sobald der Song einmal gespielt hat.</div>
     <div style="text-align:center;margin-top:4px"><button class="link" id="skip">Hängt? Anderen Song laden</button></div>
@@ -148,7 +152,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
     <label class="chk"><input type="checkbox" id="ckT"> <span id="ckTl"></span></label>
     <label class="chk"><input type="checkbox" id="ckA"> <span id="ckAl"></span></label>
     <div class="sub">Haken sind vorbelegt (ähnlicher Abgleich), du kannst sie korrigieren.</div>
-    <div class="big" id="ptsPrev"></div>
+    <div class="big" id="ptsPrev"></div><div class="sub" id="ptsInfo" style="text-align:center"></div>
     <div class="msg" id="whoMsg" hidden>Wenn nichts gewählt wird, wird für niemand ein Punkt vergeben. Zum Bestätigen nochmal tippen.</div>
     <div class="row"><button id="nextBtn" data-ic="arrow"><span class="t">Weiter</span></button></div>
   </div>
@@ -193,7 +197,7 @@ ol.h{padding-left:20px;margin:6px 0;font-size:.92rem}
   <li>Titel und Interpret eintippen, dann <b>Aufdecken</b>. Du siehst YouTube-Titel und Kanal, die Haken sind vorbelegt und von dir änderbar.</li>
   <li><b>Weiter</b> bucht die Punkte und startet die nächste Runde (wieder per Tipp auf Abspielen).</li></ol>
   <h3>Punkte</h3>
-  <p>Titel richtig: <b>2</b> Punkte, Interpret richtig: <b>1</b> Punkt. Der Abgleich ist tolerant: Groß/Klein, Akzente, Reihenfolge und kleine Tippfehler sind egal. Steht in beiden Feldern derselbe Text, zählt er nur einmal. Hinweise und Zeitbonus kommen in einer späteren Version.</p>
+  <p>Titel richtig: <b>2</b> Punkte, Interpret richtig: <b>1</b> Punkt. Der Abgleich ist tolerant: Groß/Klein, Akzente, Reihenfolge und kleine Tippfehler sind egal. Steht in beiden Feldern derselbe Text, zählt er nur einmal. <b>Zeitbonus</b> (abschaltbar): 3 s ×3, 10 s ×2, 20 s ×1,5; beim ganzen Song sinkt er mit der gehörten Zeit (bis 3 s ×3, bis 10 s ×2, bis 20 s ×1,5, danach ×1). <b>Hinweise</b> (Genre, Länge, Anfang) kosten je Punkte (einstellbar), die Runde gibt nie unter 0. „Player anzeigen“ ist kostenlos (für Werbung).</p>
   <h3>Freunde-Modus</h3><p>Im Modus „Freunde (ein Gerät)“ trägst du 2 bis 12 Namen ein. Pro Runde wählst du im Feld „Wer hat zuerst geraten?“ die Person (oder „niemand“), die Punkte gehen an sie. Wählst du niemanden und es gibt Punkte, warnt der rote Weiter-Knopf einmal, beim zweiten Tippen gilt „niemand“. Am Ende gibt es Rangliste, Sieger oder Gleichstand.</p><h3>Player / Werbung</h3><p>„Hängt? Anderen Song laden“ ist nur der Notknopf, falls ein Song nicht startet.</p>
   <p><b>Player anzeigen</b> blendet das Video ein, damit du Werbung wegklicken kannst. Werbung automatisch zu erkennen geht nicht.</p>
   <p>Beste Nutzung mit Adblocker. Beobachtet: <b>Chrome</b> zeigt bei jedem Song Werbung, <b>Brave</b> blockt sie von selbst. Auch <b>Firefox mit uBlock Origin</b> sollte gehen (nicht geprüft). Ob der Blocker im <i>installierten</i> App-Fenster (PWA) greift, ist offen.</p>
@@ -219,9 +223,9 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 /* ---------- Speicher ---------- */
 let DB=loadDB();
 function loadDB(){let o={};try{o=JSON.parse(localStorage.getItem(K))||{}}catch(e){}
-  o.settings=Object.assign({len:10,start:'random',rounds:10,genres:[],mode:'solo',names:['','']},o.settings);
+  o.settings=Object.assign({len:10,start:'random',rounds:10,genres:[],mode:'solo',names:['',''],timeBonus:true,hintCost:1},o.settings);
   o.pl=Object.assign({discardDefaults:false,override:{},off:{},custom:[]},o.pl);
-  o.idCache=o.idCache||{};return o;}
+  o.idCache=o.idCache||{};o.history=Array.isArray(o.history)?o.history:[];return o;}
 function save(){try{localStorage.setItem(K,JSON.stringify(DB))}catch(e){}}
 
 /* ---------- Helfer ---------- */
@@ -288,7 +292,7 @@ function activeSources(){
 
 /* ---------- YouTube ---------- */
 const S={player:null,decks:{},bad:{},score:0,round:0,hist:[],cur:null,srcKey:null,seg:null,first:false,seeked:false,started:false,vd:null,revealed:false,endT:null,wd:null,retry:0,busy:false,pshown:false,pi:null,parsed:null,active:false};
-S.names=[];S.scores={};S.friends=false;S.errRun=0;
+S.names=[];S.scores={};S.friends=false;S.errRun=0;S.hint={};S.hintCost=0;S.heard=0;S.mult=1;
 function loadApi(){
   if(window.YT&&window.YT.Player)return Promise.resolve();
   return new Promise((res,rej)=>{window.onYouTubeIframeAPIReady=res;const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>rej(new Error('YouTube-API nicht ladbar (Netz?)'));document.head.appendChild(s);setTimeout(()=>rej(new Error('Zeitüberschreitung beim Laden der YouTube-API')),12000);});
@@ -338,7 +342,7 @@ const IC={play:SV('M8 5v14l11-7z'),pause:SV('M6 5h4v14H6zM14 5h4v14h-4z'),
 function setT(id,t){const e=$(id).querySelector('.t');if(e)e.textContent=t;}
 function setPlayBtn(replay){$('play').innerHTML=IC[replay?'replay':'play']+'<span class="t">'+(replay?'Nochmal hören':'Abspielen')+'</span>';}
 function setTT(st){const t=$('tt');t.classList.toggle('loading',st==='loading');t.classList.toggle('playing',st==='playing');}
-function setBusy(on){S.busy=on;['play','pause','reveal','skip'].forEach(i=>$(i).disabled=on);if(!on)$('reveal').disabled=!S.vd||S.revealed;}
+function setBusy(on){S.busy=on;['play','pause','reveal','skip'].forEach(i=>$(i).disabled=on);if(!on)$('reveal').disabled=!S.vd||S.revealed;updateHints();}
 function hud(){const r=DB.settings.rounds;$('hud').textContent='Runde '+(S.round+1)+(r?'/'+r:'')+(S.friends?'':' · '+S.score+' Punkte');$('scores').textContent=S.friends?S.names.map(n=>n+' '+S.scores[n]).join(' · '):'';}
 function placePlayer(){
   const pw=$('pw');
@@ -358,7 +362,7 @@ function renderHome(){
 $('chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b||b.disabled)return;const id=b.dataset.g,a=DB.settings.genres;const i=a.indexOf(id);i>=0?a.splice(i,1):a.push(id);save();renderHome();});
 ['sLen','sStart','sRounds'].forEach(id=>$(id).addEventListener('change',()=>{DB.settings.len=+$('sLen').value;DB.settings.start=$('sStart').value;DB.settings.rounds=+$('sRounds').value;save();}));
 function homeError(m){show('home');$('homeMsg').textContent=m;$('homeMsg').hidden=false;}
-function renderMode(){const f=DB.settings.mode==='friends';$('mSolo').setAttribute('aria-pressed',String(!f));$('mFriends').setAttribute('aria-pressed',String(f));$('namesBox').hidden=!f;if(f)renderNames();}
+function renderMode(){renderExtras();const f=DB.settings.mode==='friends';$('mSolo').setAttribute('aria-pressed',String(!f));$('mFriends').setAttribute('aria-pressed',String(f));$('namesBox').hidden=!f;if(f)renderNames();}
 function renderNames(){const st=DB.settings;if(!Array.isArray(st.names))st.names=[];while(st.names.length<2)st.names.push('');
   $('names').innerHTML=st.names.map((n,i)=>`<div class="row" style="margin-top:6px"><input type="text" data-i="${i}" value="${esc(n)}" placeholder="Name ${i+1}" maxlength="20" autocomplete="off"><button class="sec small" data-rm="${i}" style="flex:0 0 48px" aria-label="Entfernen" ${st.names.length<=2?'disabled':''}>✕</button></div>`).join('');
   $('addPerson').disabled=st.names.length>=12;}
@@ -375,12 +379,12 @@ function resetRoundUI(){
   stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}
   $('inTitle').value='';$('inArtist').value='';$('rev').hidden=true;setTT('idle');$('who').value='';$('whoMsg').hidden=true;S.warned=false;$('nextBtn').classList.remove('warn');
   $('label').setAttribute('fill','hsl('+Math.floor(Math.random()*360)+' 75% 55%)');
-  S.cur=null;S.seg=null;S.started=false;S.vd=null;S.revealed=false;S.parsed=null;S.first=false;S.seeked=false;
+  S.cur=null;S.seg=null;S.started=false;S.vd=null;S.revealed=false;S.parsed=null;S.first=false;S.seeked=false;resetHints();
   setPlayBtn(false);showPlayer(false);hud();
 }
 async function newSong(note,auto){
   setBusy(true);resetRoundUI();setStatus('Song wird ausgewählt …');
-  try{await ensurePlayer();const p=await pickSong();S.cur=p.vid;S.srcKey=p.key;setBusy(false);if(auto){setStatus(note||'');play();}else setStatus((note?note+' ':'')+'Tippe auf „Abspielen“.');}
+  try{await ensurePlayer();const p=await pickSong();S.cur=p.vid;S.srcKey=p.key;updateHints();setBusy(false);if(auto){setStatus(note||'');play();}else setStatus((note?note+' ':'')+'Tippe auf „Abspielen“.');}
   catch(e){S.active=false;homeError(e.message);}
 }
 async function startGame(){
@@ -413,7 +417,7 @@ function wdFire(){
 }
 function updateInfo(){try{const d=S.player.getVideoData();if(d&&d.title)S.vd=d;}catch(e){}}
 function startSegment(){
-  const c=cfg();updateInfo();setStatus('spielt …');
+  const c=cfg();updateInfo();setStatus('spielt …');updateHints();
   if(!S.revealed)$('reveal').disabled=!S.vd;
   if(c.len>0){clearTimeout(S.endT);S.endT=setTimeout(()=>{try{S.player.pauseVideo();}catch(e){}setStatus('Ausschnitt vorbei – rate!');},c.len*1000);}
 }
@@ -440,7 +444,7 @@ function onError(e){
 }
 function reveal(){
   updateInfo();if(!S.vd||!S.vd.title){setStatus('Erst einmal abspielen.');return;}
-  S.revealed=true;$('reveal').disabled=true;
+  S.revealed=true;S.mult=timeMult();$('reveal').disabled=true;updateHints();
   const p=S.parsed=parseYT(S.vd.title,S.vd.author);
   $('rTitle').textContent=S.vd.title;$('rChan').textContent=S.vd.author||'–';
   $('rParsed').textContent=(p.artist?p.artist+' – ':'')+p.title+(p.artist?'':'  (Interpret ≈ Kanal: '+(p.channel||'–')+')');
@@ -451,7 +455,8 @@ function reveal(){
   showPlayer(true);setStatus('');
   setTimeout(()=>$('rev').scrollIntoView({behavior:'smooth',block:'nearest'}),50);
 }
-function ptsPrev(){const n=($('ckT').checked?PTS.title:0)+($('ckA').checked?PTS.artist:0);$('ptsPrev').textContent='+'+n+' Punkte';return n;}
+function ptsPrev(){const raw=($('ckT').checked?PTS.title:0)+($('ckA').checked?PTS.artist:0);const n=Math.max(0,Math.round(raw*S.mult)-S.hintCost);$('ptsPrev').textContent='+'+n+' Punkte';
+  const b=[];if(S.mult!==1)b.push('Zeitbonus ×'+String(S.mult).replace('.',','));if(S.hintCost)b.push('Hinweise −'+S.hintCost);$('ptsInfo').textContent=raw?b.join(' · '):'';return n;}
 function commit(){
   let who='';const n=ptsPrev();
   if(S.friends){who=$('who').value;if(!who){
@@ -463,7 +468,7 @@ function commit(){
   if(DB.settings.rounds&&S.round>=DB.settings.rounds)endGame();else newSong();
 }
 function endGame(){
-  stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}S.active=false;
+  if(S.hist.length)pushHistory();stopTimers();try{S.player&&S.player.pauseVideo();}catch(e){}S.active=false;
   if(S.friends){
     const arr=S.names.map(n=>[n,S.scores[n]]).sort((a,b)=>b[1]-a[1]);const top=arr[0][1],win=arr.filter(x=>x[1]===top).map(x=>x[0]);
     $('endScore').textContent=!S.hist.length?'–':(win.length>1?'Gleichstand: '+win.join(' & '):'🏆 '+win[0]);
@@ -539,6 +544,32 @@ $('helpBtn').onclick=()=>$('helpBg').hidden=false;
 $('helpClose').onclick=()=>$('helpBg').hidden=true;
 $('helpBg').addEventListener('click',e=>{if(e.target.id==='helpBg')$('helpBg').hidden=true;});
 
+/* ---------- Zeitbonus, Hinweise, Verlauf ---------- */
+function timeMult(){if(DB.settings.timeBonus===false)return 1;const l=+DB.settings.len;if(l>0)return {3:3,10:2,20:1.5}[l]||1;const h=S.heard;return h<=3?3:h<=10?2:h<=20?1.5:1;}
+setInterval(()=>{if(S.player&&S.started&&!S.revealed){try{if(S.player.getPlayerState()===1&&!(S.player.isMuted&&S.player.isMuted()))S.heard+=0.25;}catch(e){}}},250);
+function resetHints(){S.hint={};S.hintCost=0;S.heard=0;S.mult=1;$('hintOut').innerHTML='';updateHints();}
+function updateHints(){const c=DB.settings.hintCost,x=c?' (−'+c+')':'';const ok=!S.revealed&&!S.busy;
+  [['hG','Genre',!!S.cur],['hL','Länge',!!S.vd],['hS','Anfang',!!S.vd]].forEach(([id,t,have])=>{$(id).textContent=t+x;$(id).disabled=!(ok&&have)||!!S.hint[id[1]];});}
+function useHint(k){
+  if(S.hint[k]||S.revealed)return;let txt='';
+  if(k==='G'){const s=sources().find(x=>x.key===S.srcKey);txt='Genre: '+(s?(s.custom?s.name:s.genreName):'?');}
+  else{updateInfo();if(!S.vd)return;const p=parseYT(S.vd.title,S.vd.author),t=p.title||p.whole,isL=/[\p{L}\p{N}]/u;
+    const n=[...t].filter(ch=>isL.test(ch)).length;
+    if(k==='L')txt='Titel: '+n+' Buchstaben in '+t.split(/\s+/).filter(Boolean).length+' Wörtern';
+    else{const kk=Math.max(1,Math.ceil(n*0.1));let c=0;txt='Anfang: '+[...t].map(ch=>isL.test(ch)?(c++<kk?ch:'_'):ch).join('');}}
+  S.hint[k]=txt;S.hintCost+=DB.settings.hintCost;$('hintOut').innerHTML=Object.values(S.hint).map(esc).join('<br>');updateHints();
+}
+$('hG').onclick=()=>useHint('G');$('hL').onclick=()=>useHint('L');$('hS').onclick=()=>useHint('S');
+function pushHistory(){const st=DB.settings,f=S.friends,gl=genreList();
+  DB.history.unshift({t:Date.now(),f:f,r:S.hist.length,g:st.genres.length?st.genres.map(id=>(gl.find(g=>g.id===id)||{}).name||id).join(', '):'gemischt',res:f?S.names.map(n=>[n,S.scores[n]]).sort((a,b)=>b[1]-a[1]):S.score});
+  DB.history=DB.history.slice(0,30);save();}
+function renderExtras(){const st=DB.settings;$('sBonus').checked=st.timeBonus!==false;$('sHint').value=String(st.hintCost);
+  const h=DB.history;$('histCard').hidden=!h.length;
+  $('histList').innerHTML=h.slice(0,10).map(e=>{const d=new Date(e.t),ds=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    return `<li>${ds} · ${e.f?'Freunde':'Solo'} · ${e.r} Runden · ${esc(e.g)}<br><b>${e.f?e.res.map(x=>esc(x[0])+' '+x[1]).join(', '):e.res+' Punkte'}</b></li>`;}).join('');}
+$('sBonus').onchange=()=>{DB.settings.timeBonus=$('sBonus').checked;save();};
+$('sHint').onchange=()=>{DB.settings.hintCost=+$('sHint').value;save();};
+$('histClear').onclick=()=>{DB.history=[];save();renderHome();};
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 document.querySelectorAll('[data-ic]').forEach(b=>b.insertAdjacentHTML('afterbegin',IC[b.dataset.ic]));renderHome();
 window.__sg={S:S,DB:function(){return DB},parseYT,judge,cleanTitle,norm,scoreTitle,scoreArtist};
